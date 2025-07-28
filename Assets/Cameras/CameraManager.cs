@@ -11,6 +11,7 @@ public class CameraManager : MonoBehaviour
 
     void Start()
     {
+        Debug.Log("Per cambiare la visuale premere \"\\\"");
         SwitchView(currentMode); // Imposta visuale iniziale
     }
 
