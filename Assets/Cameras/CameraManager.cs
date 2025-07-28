@@ -12,6 +12,7 @@ public class CameraManager : MonoBehaviour
     void Start()
     {
         SwitchView(currentMode); // Imposta visuale iniziale
+        Debug.Log("cambio telecamera baqwote");
     }
 
     void Update()
