@@ -1,0 +1,22 @@
+name: Notifica Discord
+
+on:
+  push:
+    branches:
+      - scene1_inventory_roberto
+      - scene1_dialogue_ui_dario
+      - scene1_dialogue_ui_lorena
+      - scene1_interactions_marco
+      - scene1_interactions_alex
+
+jobs:
+  invia-messaggio-discord:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Invia notifica a Discord
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d "{\"content\": \"🔔 Push da **${{ github.actor }}** sul branch `${{ github.ref }}`\n🔗 [Visualizza commit](https://github.com/${{ github.repository }}/commit/${{ github.sha }})\"}" \
+               https://discord.com/api/webhooks/1399789731788619857/UgaSyZkT-OvH7TBUlbc-yO0GnKq0fgjV22RgmwPkAlVJC_UAKkxZBF7vBkgS4NYGgNNt/github
