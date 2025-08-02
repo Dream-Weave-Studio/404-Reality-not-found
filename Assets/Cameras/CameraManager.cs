@@ -2,8 +2,13 @@
 using Cinemachine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Gestisce la visuale della camera (2.5D vs Isometrica),
+/// il suo zoom reattivo, e la transizione tra modalità.
+/// </summary>
 public class CameraManager : MonoBehaviour
 {
+    #region Riferimenti e impostazioni
 
     public CinemachineVirtualCamera vcam2_5D;
     public CinemachineVirtualCamera vcamIso;
@@ -14,9 +19,12 @@ public class CameraManager : MonoBehaviour
     private float targetZoom;
     public float zoomSensitivity_mouse;
     public float zoomSensitivity_stick;
-    float zoomSensitivity;
 
     public float zoomLagSpeed = 10f; // Più basso = risposta più lenta
+
+    #endregion
+
+    #region Inizializzazione
 
     void Start()
     {
@@ -29,41 +37,49 @@ public class CameraManager : MonoBehaviour
         vcamIso.Follow = FindPlayerTransform();
 
     }
+    #endregion
 
+    #region Gestione visuale e zoom
     void Update()
     {
-
+        HandleViewSwitchInput();
+        HandleZoomInput();
+        ApplyZoomSmoothing();
+    }
+    void HandleViewSwitchInput()
+    {
         if (Keyboard.current.backquoteKey.wasPressedThisFrame)
         {
             ViewMode newMode = currentMode == ViewMode.Side2_5D ? ViewMode.Isometric : ViewMode.Side2_5D;
             SwitchView(newMode);
         }
+    }
+    void HandleZoomInput()
+    {
         float scrollInput = InputManager.Instance.Zoom.ReadValue<float>();
         var device = InputManager.Instance.Zoom.activeControl?.device;
-
-        Debug.Log($"Zoom input from device: {device?.GetType().Name}");
 
         if (scrollInput != 0)
         {
             float sensitivity = zoomSensitivity_mouse;
-
-            if (device is UnityEngine.InputSystem.Gamepad)
-            {
-                sensitivity *= zoomSensitivity_stick; 
-            }
-
+            if (device is Gamepad)
+                sensitivity *= zoomSensitivity_stick;
 
             targetZoom -= scrollInput * sensitivity;
             targetZoom = Mathf.Clamp(targetZoom, 4f, 12f);
         }
-
+    }
+    void ApplyZoomSmoothing()
+    {
         vcamIso.m_Lens.OrthographicSize = Mathf.MoveTowards(
             vcamIso.m_Lens.OrthographicSize,
             targetZoom,
             zoomLagSpeed * Time.deltaTime
         );
-
     }
+    #endregion
+
+    #region Utility
     Transform FindPlayerTransform()
     {
         GameObject playerObj = GameObject.FindWithTag("Player");
@@ -80,4 +96,5 @@ public class CameraManager : MonoBehaviour
 
         Debug.Log($"Visuale attuale: {currentMode}");
     }
+    #endregion
 }
