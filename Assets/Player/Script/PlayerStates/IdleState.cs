@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class IdleState : IPlayerState
 {
-    private PlayerMovement player;
+    private PlayerController player;
 
-    public IdleState(PlayerMovement player)
+    public IdleState(PlayerController player)
     {
         this.player = player;
     }

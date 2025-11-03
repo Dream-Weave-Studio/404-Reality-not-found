@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class RunningState : IPlayerState
 {
-    private PlayerMovement player;
+    private PlayerController player;
 
-    public RunningState(PlayerMovement playerMovement)
+    public RunningState(PlayerController playerMovement)
     {
         this.player = playerMovement;
     }

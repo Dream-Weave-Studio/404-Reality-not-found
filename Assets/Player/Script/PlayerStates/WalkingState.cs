@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class WalkingState : IPlayerState
 {
-    private PlayerMovement player;
+    private PlayerController player;
 
-    public WalkingState(PlayerMovement playerMovement)
+    public WalkingState(PlayerController playerMovement)
     {
         this.player = playerMovement;
     }
