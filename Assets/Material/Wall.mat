@@ -147,7 +147,7 @@ Material:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _PlayerPos: {r: -7.1676173, g: 1.0996577, b: -5.2134085, a: 0}
-    - _PlayerPosition: {r: 0.5, g: 0.5, b: 9.999999, a: 0}
+    - _PlayerPosition: {r: 0.50183463, g: 0.50134337, b: 10.01861, a: 0}
     - _PlayerPosition_1: {r: 0, g: 0, b: 0, a: 0}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
     - _Tint: {r: 1, g: 1, b: 1, a: 0}
