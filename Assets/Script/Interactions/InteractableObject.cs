@@ -20,6 +20,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
     [Header("Quest Logic (Priorità Alta)")]
     public string requiredObjective;
     public string updateObjectiveTo;
+
     [TextArea(3, 10)]
     public string[] questDialogueLines;
 
@@ -175,4 +176,5 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
         return null;
     }
+
 }
