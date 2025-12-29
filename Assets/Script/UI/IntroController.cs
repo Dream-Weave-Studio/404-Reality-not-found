@@ -5,6 +5,8 @@ using UnityEngine.UI;
 
 public class IntroController : MonoBehaviour
 {
+    public static IntroController Instance; // 1. Diventa Singleton
+
     [Header("UI References")]
     public GameObject introPanel;       // Il pannello nero (Panel_IntroSequence)
     public CanvasGroup introCanvasGroup; // Il componente CanvasGroup sul pannello
@@ -22,48 +24,87 @@ public class IntroController : MonoBehaviour
     private bool isTyping = false;      // Per evitare skip mentre scrive
     private bool introFinished = false;
 
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            // 2. Setup iniziale del Sopravvissuto
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            // 3. REFRESH: Il nuovo IntroController (della scena ricaricata) 
+            // passa i collegamenti freschi al vecchio IntroController (Sopravvissuto)
+
+            Instance.introPanel = this.introPanel;
+            Instance.introCanvasGroup = this.introCanvasGroup;
+            Instance.letterText = this.letterText;
+
+            // Passiamo anche i dati del contenuto, nel caso avessi cambiato testo nell'inspector
+            Instance.introLines = this.introLines;
+
+            // Se l'intro era già finita nella sessione precedente, assicura che il pannello sia spento
+            if (GameManager.Instance != null && GameManager.Instance.introFinished)
+            {
+                if (Instance.introPanel != null) Instance.introPanel.SetActive(false);
+            }
+
+            // 4. Il nuovo si sacrifica
+            Destroy(gameObject);
+        }
+    }
+
     private void Start()
     {
-        // Se il GameManager dice che l'intro è già finita, spegniti subito.
-        if (GameManager.Instance.introFinished)
-        {
-            introPanel.SetActive(false);
-            return; // Esci e non fare nulla
-        }
+        // Se non sono l'istanza ufficiale, non faccio nulla (sto per essere distrutto)
+        if (Instance != this) return;
 
-        // Controllo stato originale
-        if (GameManager.Instance.currentState != GameManager.GameState.IntroSequence)
+        CheckIntroStart();
+    }
+
+    // Spostiamo la logica di avvio in un metodo pubblico/riutilizzabile
+    public void CheckIntroStart()
+    {
+        // Se il GameManager dice che l'intro è già finita...
+        if (GameManager.Instance != null && GameManager.Instance.introFinished)
         {
-            introPanel.SetActive(false);
+            if (introPanel != null) introPanel.SetActive(false);
             return;
         }
 
+        // Se lo stato non è IntroSequence...
+        if (GameManager.Instance != null && GameManager.Instance.currentState != GameManager.GameState.IntroSequence)
+        {
+            if (introPanel != null) introPanel.SetActive(false);
+            return;
+        }
+
+        // --- AVVIO INTRO ---
         Time.timeScale = 1f;
+        currentLineIndex = 0; // Reset indice
 
-        // Setup iniziale
-        introPanel.SetActive(true);
-        introCanvasGroup.alpha = 1; // Tutto nero
+        if (introPanel != null)
+        {
+            introPanel.SetActive(true);
+            if (introCanvasGroup != null) introCanvasGroup.alpha = 1;
+        }
 
-        // Debug per vedere in console quale velocità sta usando davvero
-        Debug.Log("Intro partita. Typing Speed attuale: " + typingSpeed);
-
-        StartCoroutine(TypeLine(introLines[currentLineIndex]));
+        if (introLines != null && introLines.Length > 0)
+        {
+            StartCoroutine(TypeLine(introLines[currentLineIndex]));
+        }
     }
 
     private void Update()
     {
-        // Gestiamo l'input solo se siamo nell'intro e non è finita
+        if (Instance != this) return; // Solo il sopravvissuto lavora
         if (introFinished) return;
 
-        // Se il giocatore preme Spazio, Invio o Click sinistro
+        // Input per avanzare
         if (Input.GetKeyDown(KeyCode.Space) || Input.GetMouseButtonDown(0) || Input.GetKeyDown(KeyCode.Return))
         {
-            if (isTyping)
-            {
-                // TODO: Se volessimo completare subito la frase corrente (skip typing)
-                // Implementazione futura
-            }
-            else
+            if (!isTyping)
             {
                 NextLine();
             }
@@ -87,19 +128,15 @@ public class IntroController : MonoBehaviour
     private IEnumerator TypeLine(string line)
     {
         isTyping = true;
-        letterText.text = "";
+        if (letterText != null) letterText.text = "";
 
         foreach (char c in line.ToCharArray())
         {
-            letterText.text += c;
-            // Qui potresti inserire un suono: AudioManager.Play("KeyboardClick");
-            // Usa Realtime per ignorare eventuali Time.timeScale o lag del gioco
+            if (letterText != null) letterText.text += c;
             yield return new WaitForSecondsRealtime(typingSpeed);
         }
 
         isTyping = false;
-
-        // Opzionale: Mostra un'icona "Premi per continuare" lampeggiante qui
     }
 
     private void FinishIntro()
@@ -110,26 +147,22 @@ public class IntroController : MonoBehaviour
 
     private IEnumerator FadeOutSequence()
     {
-        // 1. Aspetta un attimo prima di dissolvere
         yield return new WaitForSeconds(0.5f);
 
-        // 2. Fade Out del pannello nero (usando CanvasGroup)
         float elapsedTime = 0;
-        float startAlpha = introCanvasGroup.alpha;
+        float startAlpha = (introCanvasGroup != null) ? introCanvasGroup.alpha : 1;
 
         while (elapsedTime < fadeOutDuration)
         {
             elapsedTime += Time.deltaTime;
-            introCanvasGroup.alpha = Mathf.Lerp(startAlpha, 0, elapsedTime / fadeOutDuration);
+            if (introCanvasGroup != null)
+                introCanvasGroup.alpha = Mathf.Lerp(startAlpha, 0, elapsedTime / fadeOutDuration);
             yield return null;
         }
 
-        introCanvasGroup.alpha = 0;
-        introPanel.SetActive(false);
+        if (introCanvasGroup != null) introCanvasGroup.alpha = 0;
+        if (introPanel != null) introPanel.SetActive(false);
 
-        // 3. COMUNICAZIONE FONDAMENTALE COL GAMEMANAGER
-        // Diciamo al "Regista" che l'intro è finita.
-        // Il GameManager sbloccherà i controlli e farà partire la sveglia.
         if (GameManager.Instance != null)
         {
             GameManager.Instance.EndIntro();

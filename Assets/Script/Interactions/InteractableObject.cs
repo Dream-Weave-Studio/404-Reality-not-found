@@ -24,6 +24,39 @@ public class InteractableObject : MonoBehaviour, IInteractable
     [TextArea(3, 10)]
     public string[] questDialogueLines;
 
+
+    private void OnEnable()
+    {
+        StartCoroutine(CheckPersistenceDelayed());
+    }
+
+    private System.Collections.IEnumerator CheckPersistenceDelayed()
+    {
+        // Aspetta 1 frame. Questo dà tempo al SaveManager di eseguire OnSceneLoaded
+        // e riempire l'inventario PRIMA che l'oggetto controlli se deve sparire.
+        yield return null;
+
+        CheckPersistence();
+    }
+
+    // Controlla se l'oggetto deve esistere o no in base ai salvataggi
+    private void CheckPersistence()
+    {
+        // Se questo oggetto dà un item, ed è impostato per distruggersi...
+        if (interactableData != null &&
+            interactableData.itemToGive != null &&
+            interactableData.destroyAfterInteraction)
+        {
+            // ...controlliamo se il giocatore ce l'ha già in tasca.
+            if (InventoryManager.Instance != null &&
+                InventoryManager.Instance.HasItem(interactableData.itemToGive.itemID))
+            {
+                // Se ce l'ha, ci disattiviamo subito.
+                SetObjectActive(false);
+            }
+        }
+    }
+
     public void Interact()
     {
         if (interactableData == null) return;
@@ -129,16 +162,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // Se è un oggetto da raccogliere (come il Telefono), deve sparire dalla scena
         if (interactableData.destroyAfterInteraction)
         {
-            // Caso A: Hai assegnato manualmente un padre
-            if (objectToHide != null)
-            {
-                objectToHide.SetActive(false);
-            }
-            // Caso B: Non hai assegnato nulla, spegne se stesso
-            else
-            {
-                gameObject.SetActive(false);
-            }
+            SetObjectActive(false);
         }
     }
 
@@ -159,6 +183,21 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
 
         return false;
+    }
+
+    // Helper per gestire la disattivazione gerarchica (Padre vs Figlio)
+    private void SetObjectActive(bool isActive)
+    {
+        // Caso A: Hai assegnato manualmente un padre
+        if (objectToHide != null)
+        {
+            objectToHide.SetActive(false);
+        }
+        // Caso B: Non hai assegnato nulla, spegne se stesso
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     // Helper per cercare la variante corretta

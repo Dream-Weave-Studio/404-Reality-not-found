@@ -21,11 +21,23 @@ public class DialogManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            // PASSAGGIO DI CONSEGNE: Do al vecchio manager i riferimenti ai nuovi pannelli
+            Instance.dialogPanel = this.dialogPanel;
+            Instance.portraitImage = this.portraitImage;
+            Instance.dialogText = this.dialogText;
 
-        // Assicuriamoci che il pannello sia spento all'avvio
-        if (dialogPanel != null) dialogPanel.SetActive(false);
+            // Mi assicuro che il pannello sia spento all'inizio
+            if (Instance.dialogPanel != null) Instance.dialogPanel.SetActive(false);
+
+            Destroy(gameObject);
+        }
     }
 
     // Metodo chiamato dagli oggetti
