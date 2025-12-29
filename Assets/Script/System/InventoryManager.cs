@@ -27,6 +27,12 @@ public class InventoryManager : MonoBehaviour
         }
         else
         {
+            // TRUCCO: Prima di distruggermi, passo il database al sopravvissuto!
+            if (this.allItemsDatabase != null && this.allItemsDatabase.Count > 0)
+            {
+                Instance.allItemsDatabase = this.allItemsDatabase;
+            }
+
             Destroy(gameObject);
         }
     }

@@ -27,6 +27,56 @@ public class InputManager : MonoBehaviour
     }
     #endregion
 
+    #region Input System UI Support
+
+    public enum InputType { Keyboard, Xbox, PlayStation, GenericGamepad }
+    public InputType currentInputType = InputType.Keyboard;
+
+    // Evento che la UI ascolterà per aggiornare le icone al volo
+    public event Action<InputType> OnInputChanged;
+
+    private void Update()
+    {
+        // Controllo semplice dell'ultimo dispositivo attivo
+        if (Gamepad.current != null && Gamepad.current.wasUpdatedThisFrame)
+        {
+            UpdateInputType(Gamepad.current);
+        }
+        else if (Keyboard.current != null && Keyboard.current.wasUpdatedThisFrame || Mouse.current.wasUpdatedThisFrame)
+        {
+            SetInputType(InputType.Keyboard);
+        }
+    }
+
+    private void UpdateInputType(Gamepad gamepad)
+    {
+        // Rilevamento basico del tipo di controller
+        // (Per una precisione assoluta servirebbero i Device Layouts, ma questo copre il 90% dei casi)
+        string deviceName = gamepad.name.ToLower();
+
+        if (deviceName.Contains("dualshock") || deviceName.Contains("dualsense") || deviceName.Contains("playstation"))
+        {
+            SetInputType(InputType.PlayStation);
+        }
+        else // Defaultiamo a Xbox per tutto il resto (XInput standard)
+        {
+            SetInputType(InputType.Xbox);
+        }
+    }
+
+    private void SetInputType(InputType newType)
+    {
+        if (currentInputType != newType)
+        {
+            currentInputType = newType;
+            Debug.Log($"Input cambiato in: {newType}");
+            OnInputChanged?.Invoke(newType);
+        }
+    }
+
+    #endregion
+
+
     #region Input System Setup
     private PlayerControls controls;
 
@@ -53,7 +103,12 @@ public class InputManager : MonoBehaviour
 
     private void OnDisable()
     {
-        controls.Disable();
+        // AGGIUNTA SICUREZZA: "controls" potrebbe essere null se l'oggetto 
+        // viene distrutto nel Awake (Singleton pattern) prima di essere inizializzato.
+        if (controls != null)
+        {
+            controls.Disable();
+        }
     }
 
     #endregion

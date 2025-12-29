@@ -1,11 +1,14 @@
 using UnityEngine;
-using System.IO; // Necessario per lavorare con i file
+using System.IO;
+using UnityEngine.SceneManagement;
 
 public class SaveManager : MonoBehaviour
 {
     public static SaveManager Instance;
-
     private string saveFilePath;
+
+    // Variabile temporanea per tenere i dati mentre la scena si ricarica
+    private GameData pendingLoadData = null;
 
     void Awake()
     {
@@ -13,18 +16,24 @@ public class SaveManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            // Definiamo il percorso del file. Su Windows sarà in AppData/LocalLow/TuoNome/404Reality...
             saveFilePath = Path.Combine(Application.persistentDataPath, "savegame.json");
         }
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
-    // Chiamalo quando vuoi salvare (es. ai Checkpoint o dal Menu)
+    // Ci iscriviamo all'evento: "Avvisami quando una scena finisce di caricare"
+    private void OnEnable() => SceneManager.sceneLoaded += OnSceneLoaded;
+    private void OnDisable() => SceneManager.sceneLoaded -= OnSceneLoaded;
+
+    // --- SALVATAGGIO ---
     public void SaveGame()
     {
         GameData data = new GameData();
 
-        // 1. Raccogli Posizione Player
+        // 1. Posizione Player
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
@@ -33,38 +42,38 @@ public class SaveManager : MonoBehaviour
             data.playerPosition[2] = player.transform.position.z;
         }
 
-        // 2. Raccogli Memoria
+        // 2. Memoria (Usa i nomi corretti del tuo MemoryManager)
         if (MemoryManager.Instance != null)
         {
             data.learnedFacts = MemoryManager.Instance.GetFactsForSave();
         }
 
-        // 3. Raccogli Inventario
+        // 3. Inventario (Usa i nomi corretti del tuo InventoryManager)
         if (InventoryManager.Instance != null)
         {
             data.inventoryItemIDs = InventoryManager.Instance.GetInventoryIDsForSave();
         }
 
-        // 4. Salva stato Intro
+        // 4. Stato Intro
         if (GameManager.Instance != null)
         {
             data.introFinished = GameManager.Instance.introFinished;
         }
 
-        // 5. Salva Obiettivo Corrente (NUOVO)
+        // 5. Obiettivo
         if (ObjectiveManager.Instance != null)
         {
             data.currentObjective = ObjectiveManager.Instance.GetCurrentObjective();
         }
 
-        // 6. Scrivi su disco
-        string json = JsonUtility.ToJson(data, true); // 'true' per formattazione leggibile
+        // Scrittura su file
+        string json = JsonUtility.ToJson(data, true);
         File.WriteAllText(saveFilePath, json);
 
-        Debug.Log($"[SaveManager] Partita salvata in: {saveFilePath}");
+        Debug.Log($"[SaveManager] Salvato in: {saveFilePath}");
     }
 
-    // Chiamalo quando premi "Continua"
+    // --- CARICAMENTO ---
     public void LoadGame()
     {
         if (!File.Exists(saveFilePath))
@@ -74,48 +83,66 @@ public class SaveManager : MonoBehaviour
         }
 
         string json = File.ReadAllText(saveFilePath);
-        GameData data = JsonUtility.FromJson<GameData>(json);
 
-        // 1. Ripristina Posizione
+        // FASE 1: Leggi i dati in memoria ma NON applicarli ancora
+        pendingLoadData = JsonUtility.FromJson<GameData>(json);
+
+        // FASE 2: Ricarica la scena (questo resetterà tutti gli oggetti)
+        // I dati restano al sicuro nella variabile 'pendingLoadData'
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+    }
+
+    // Questo metodo parte AUTOMATICAMENTE quando la scena ha finito di ricaricarsi
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // Se non ci sono dati in attesa (es. avvio normale del gioco), non fare nulla
+        if (pendingLoadData == null) return;
+
+        Debug.Log("[SaveManager] Scena ricaricata. Applico i dati salvati...");
+
+        // FASE 3: Applicazione Dati (Ora la scena è pulita e pronta)
+
+        // A. Ripristina Intro
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RestoreGameState(pendingLoadData.introFinished);
+        }
+
+        // B. Ripristina Posizione Player
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player != null)
         {
-            Vector3 pos = new Vector3(data.playerPosition[0], data.playerPosition[1], data.playerPosition[2]);
-            // Se usi un CharacterController, disabilitalo momentaneamente prima di teletrasportare
-            player.transform.position = pos;
+            CharacterController cc = player.GetComponent<CharacterController>();
+            if (cc != null) cc.enabled = false; // Disabilita physics per teletrasporto sicuro
+
+            player.transform.position = new Vector3(
+                pendingLoadData.playerPosition[0],
+                pendingLoadData.playerPosition[1],
+                pendingLoadData.playerPosition[2]
+            );
+
+            if (cc != null) cc.enabled = true;
         }
 
-        // 2. Ripristina Memoria
-        if (MemoryManager.Instance != null)
-        {
-            MemoryManager.Instance.LoadFactsFromSave(data.learnedFacts);
-        }
-
-        // 3. Ripristina Inventario
+        // C. Ripristina Inventario (Usa inventoryItemIDs come nel tuo GameData)
         if (InventoryManager.Instance != null)
         {
-            InventoryManager.Instance.LoadInventoryFromSave(data.inventoryItemIDs);
+            InventoryManager.Instance.LoadInventoryFromSave(pendingLoadData.inventoryItemIDs);
         }
 
-        // 4. Ripristina stato Intro 
-        if (GameManager.Instance != null)
+        // D. Ripristina Memoria (Usa learnedFacts come nel tuo GameData)
+        if (MemoryManager.Instance != null)
         {
-            // Questo setterà lo stato corretto e bloccherà l'intro se necessario
-            GameManager.Instance.RestoreGameState(data.introFinished);
+            MemoryManager.Instance.LoadFactsFromSave(pendingLoadData.learnedFacts);
         }
 
-        // 5. Ripristina Obiettivo (NUOVO)
-        // IMPORTANTE: Questo deve avvenire DOPO aver ripristinato lo stato Intro
-        if (ObjectiveManager.Instance != null)
+        // E. Ripristina Obiettivo
+        if (ObjectiveManager.Instance != null && !string.IsNullOrEmpty(pendingLoadData.currentObjective))
         {
-            // Se nel salvataggio c'è un obiettivo, usalo. 
-            // Se è vuoto (vecchio save), usa un default.
-            if (!string.IsNullOrEmpty(data.currentObjective))
-            {
-                ObjectiveManager.Instance.SetObjective(data.currentObjective);
-            }
+            ObjectiveManager.Instance.SetObjective(pendingLoadData.currentObjective);
         }
 
-        Debug.Log("[SaveManager] Partita caricata con successo.");
+        // Pulizia finale
+        pendingLoadData = null;
     }
 }

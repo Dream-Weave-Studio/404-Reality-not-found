@@ -38,7 +38,13 @@ public class PlayerInteraction : MonoBehaviour
         if (other.CompareTag("Interactable"))
         {
             currentTarget = other;
-            Debug.Log("Oggetto interattivo rilevato: " + other.name);
+
+            InteractableObject objScript = other.GetComponent<InteractableObject>();
+            if (objScript != null && InteractionPromptUI.Instance != null)
+            {
+                // MODIFICA: Passiamo l'intero script, non solo il nome
+                InteractionPromptUI.Instance.ShowPrompt(objScript);
+            }
         }
     }
 
@@ -47,6 +53,12 @@ public class PlayerInteraction : MonoBehaviour
         if (other == currentTarget)
         {
             currentTarget = null;
+
+            // Nascondi UI
+            if (InteractionPromptUI.Instance != null)
+            {
+                InteractionPromptUI.Instance.HidePrompt();
+            }
         }
     }
     #endregion

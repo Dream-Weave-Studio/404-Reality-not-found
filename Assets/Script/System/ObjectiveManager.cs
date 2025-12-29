@@ -25,6 +25,17 @@ public class ObjectiveManager : MonoBehaviour
         }
         else
         {
+            // PASSAGGIO DI CONSEGNE: Aggiorno i riferimenti alla NUOVA UI della scena
+            Instance.objectivePanel = this.objectivePanel;
+            Instance.objectiveText = this.objectiveText;
+
+            // Se l'obiettivo era attivo, mi assicuro che il pannello si riaccenda
+            if (!string.IsNullOrEmpty(Instance.GetCurrentObjective()))
+            {
+                Instance.objectivePanel.SetActive(true);
+                Instance.objectiveText.text = Instance.GetCurrentObjective();
+            }
+
             Destroy(gameObject);
         }
     }
