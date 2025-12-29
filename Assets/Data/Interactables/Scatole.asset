@@ -9,20 +9,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80ccb37d432288e459255b58562925e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 9cbfae28123821e45a1f194e41db6486, type: 3}
   m_Name: Scatole
   m_EditorClassIdentifier: 
-  id: scatola
+  id: scatole
   displayName: Scatole
   characterPortrait: {fileID: 21300000, guid: 7003ad22f9a14c647bb3c99a31defd47, type: 3}
   dialogueLines:
-  - Devo decidermi a buttare queste scatole!
-  - "...per\xF2 possono sempre essermi utili"
-  - "...s\xEC vabb\xE8 ma quando le uso..."
-  memoryVariants:
-  - requiredMemoryID: bollette
-    alternateLines:
-    - mph... altra roba
-  factToLearn: scatola
+  - Devo decidermi a buttare queste scatole.
+  - "...per\xF2 potrebbero sempre servire... "
+  - ...e si accumulano
+  memoryVariants: []
+  factToLearn: scatole
+  itemToGive: {fileID: 0}
+  destroyAfterInteraction: 0
   requiredItem: {fileID: 0}
   rageModifier: 0

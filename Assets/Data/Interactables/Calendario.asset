@@ -9,15 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 80ccb37d432288e459255b58562925e4, type: 3}
+  m_Script: {fileID: 11500000, guid: 9cbfae28123821e45a1f194e41db6486, type: 3}
   m_Name: Calendario
   m_EditorClassIdentifier: 
   id: calendario
   displayName: Calendario
   characterPortrait: {fileID: 21300000, guid: 7003ad22f9a14c647bb3c99a31defd47, type: 3}
   dialogueLines:
-  - un'altro giorno con questa puzza..
+  - "\xE8 il calendario della raccolta differenziata..."
   memoryVariants: []
   factToLearn: calendario
+  itemToGive: {fileID: 0}
+  destroyAfterInteraction: 0
   requiredItem: {fileID: 0}
   rageModifier: 0

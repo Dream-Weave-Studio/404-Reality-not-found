@@ -60,7 +60,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // ---------------------------------------------------------
         else
         {
-            // Cerchiamo se c'è una variante attiva (es. Ho visto il calendario?) [cite: 19, 256]
+            // Cerchiamo se c'è una variante attiva (es. Ho visto il calendario?)
             DialogueVariant? activeVariant = GetActiveVariant();
 
             if (activeVariant.HasValue)

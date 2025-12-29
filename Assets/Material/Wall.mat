@@ -123,12 +123,12 @@ Material:
     - _GlossyReflections: 0
     - _Height: 0.23
     - _HoleActive: 0
-    - _HoleRadius: 3
+    - _HoleRadius: 3.52
     - _HoleSize: 0.81
     - _Metallic: 0
     - _OcclusionStrength: 1
     - _Parallax: 0.005
-    - _PixelDensity: 6.49
+    - _PixelDensity: 6.68
     - _QueueControl: 0
     - _QueueOffset: 0
     - _ReceiveShadows: 1

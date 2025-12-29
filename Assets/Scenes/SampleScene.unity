@@ -241,7 +241,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ef6ce77075052642a7235bbb0c49799, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactableData: {fileID: 11400000, guid: dd319291379590041995a598ee8b7352, type: 2}
+  interactableData: {fileID: 11400000, guid: 4e6f1de58960ca54e8240f337fb8e06e, type: 2}
   objectToHide: {fileID: 0}
   requiredObjective: 
   updateObjectiveTo: 
@@ -607,6 +607,16 @@ PrefabInstance:
       propertyPath: m_StaticEditorFlags
       value: 2147483647
       objectReference: {fileID: 0}
+    - target: {fileID: -2486340786584971898, guid: 22c2647407e23fa42b83954ccb102450,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.013485
+      objectReference: {fileID: 0}
+    - target: {fileID: -2486340786584971898, guid: 22c2647407e23fa42b83954ccb102450,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.0027
+      objectReference: {fileID: 0}
     - target: {fileID: -2335307856362792726, guid: 22c2647407e23fa42b83954ccb102450,
         type: 3}
       propertyPath: m_StaticEditorFlags
@@ -696,6 +706,26 @@ PrefabInstance:
         type: 3}
       propertyPath: m_StaticEditorFlags
       value: 2147483647
+      objectReference: {fileID: 0}
+    - target: {fileID: 3453424882897571223, guid: 22c2647407e23fa42b83954ccb102450,
+        type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.013428868
+      objectReference: {fileID: 0}
+    - target: {fileID: 3453424882897571223, guid: 22c2647407e23fa42b83954ccb102450,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -5.3852644
+      objectReference: {fileID: 0}
+    - target: {fileID: 3453424882897571223, guid: 22c2647407e23fa42b83954ccb102450,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.0128
+      objectReference: {fileID: 0}
+    - target: {fileID: 3453424882897571223, guid: 22c2647407e23fa42b83954ccb102450,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -1.7769
       objectReference: {fileID: 0}
     - target: {fileID: 4375010004246485857, guid: 22c2647407e23fa42b83954ccb102450,
         type: 3}
@@ -2883,8 +2913,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventory: []
   allItemsDatabase:
-  - {fileID: 11400000, guid: 292b659373a73794190857cd93f0fde5, type: 2}
-  - {fileID: 11400000, guid: 32eb7d897c265b84e8a81222cf7483cb, type: 2}
+  - {fileID: 11400000, guid: 81635f1a9f8c91543ac2e7760e6520ba, type: 2}
 --- !u!1 &1057982534
 GameObject:
   m_ObjectHideFlags: 0
@@ -2931,7 +2960,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   interactableData: {fileID: 11400000, guid: f3fb83c51a1d980439622b70ac1c0ff6, type: 2}
-  objectToHide: {fileID: 765288959}
+  objectToHide: {fileID: 0}
   requiredObjective: CONTROLLA IL FRIGO
   updateObjectiveTo: VAI IN BAGNO A PRENDERE LE PILLOLE
   questDialogueLines:
@@ -4653,7 +4682,7 @@ MonoBehaviour:
   requiredObjective: CONTROLLA IL CALENDARIO
   updateObjectiveTo: CONTROLLA IL FRIGO
   questDialogueLines:
-  - cazzo.. passano domani!
+  - cazzo.. passano la settimana prossima!
 --- !u!65 &1645106713
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5110,7 +5139,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2ef6ce77075052642a7235bbb0c49799, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactableData: {fileID: 11400000, guid: 523e4fb41edfdf141b965e9ba06fbfa8, type: 2}
+  interactableData: {fileID: 11400000, guid: 016d3ca5612fcf94da0d5c9849567428, type: 2}
   objectToHide: {fileID: 0}
   requiredObjective: TROVA IL TELEFONO
   updateObjectiveTo: CONTROLLA IL CALENDARIO
@@ -8890,7 +8919,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!23 &6470206572646353605
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -9802,6 +9831,11 @@ PrefabInstance:
       objectReference: {fileID: 1629139537}
     - target: {fileID: 8895032803985873672, guid: 3cb3be45f33e99d449c1b490041565c2,
         type: 3}
+      propertyPath: currentState
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8895032803985873672, guid: 3cb3be45f33e99d449c1b490041565c2,
+        type: 3}
       propertyPath: introFinished
       value: 1
       objectReference: {fileID: 0}
@@ -10100,11 +10134,11 @@ SceneRoots:
   - {fileID: 1928415469}
   - {fileID: 195284034}
   - {fileID: 543450652932966316}
-  - {fileID: 8420699813860332424}
-  - {fileID: 1531697803}
   - {fileID: 58115829}
   - {fileID: 6264111627937947000}
   - {fileID: 1449733047}
   - {fileID: 2006096987}
   - {fileID: 2029092767}
   - {fileID: 655908948}
+  - {fileID: 1531697803}
+  - {fileID: 8420699813860332424}

@@ -9,9 +9,9 @@ public class GameManager : MonoBehaviour
     public enum GameState
     {
         Initialization, // Caricamento scena
-        IntroSequence,  // Schermo nero + Lettera Hacker [cite: 104]
+        IntroSequence,  // Schermo nero + Lettera Hacker
         Gameplay,       // Ryo si muove e interagisce
-        Cutscene,       // Eventi bloccanti (es. Telefonata Capo [cite: 198])
+        Cutscene,       // Eventi bloccanti (es. Telefonata Capo)
         Paused          // Menu di pausa
     }
 
@@ -43,7 +43,7 @@ public class GameManager : MonoBehaviour
 
     private void Start()
     {
-        
+
     }
 
     public void ChangeState(GameState newState)
@@ -57,9 +57,9 @@ public class GameManager : MonoBehaviour
         switch (currentState)
         {
             case GameState.IntroSequence:
-            // Non serve fare nulla qui, l'IntroController si attiverà da solo
-            // leggendo lo stato nel suo Start()
-            break;
+                // Non serve fare nulla qui, l'IntroController si attiverà da solo
+                // leggendo lo stato nel suo Start()
+                break;
             case GameState.Gameplay:
                 // Sblocca input giocatore
                 Time.timeScale = 1;

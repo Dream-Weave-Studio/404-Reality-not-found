@@ -1,22 +1,22 @@
 using UnityEngine;
 
-// Questo attributo ci permette di creare nuovi oggetti direttamente dal menu di Unity
 [CreateAssetMenu(fileName = "New Item", menuName = "404 Reality/Item Data")]
 public class SO_Item : ScriptableObject
 {
     [Header("Info Generali")]
-    public string id;             // ID univoco (es. "medikit_01")
-    public string itemName;       // Nome visualizzato (es. "Medikit")
+    public string itemID;
+    public string itemName;
 
     [Header("Visual")]
-    public Sprite icon;           // Icona per l'UI dell'inventario
-    public GameObject prefab;     // Modello 3D (opzionale, se serve spawnarlo)
+    public Sprite icon;
+    public GameObject prefab;
 
     [Header("Dettagli")]
     [TextArea(3, 10)]
-    public string description;    // Descrizione (utile per l'esame degli oggetti)
+    public string description;
 
     [Header("Logica")]
-    public bool isConsumable;     // Se vero, si consuma all'uso (es. Medikit)
-    public bool isKeyItem;        // Se vero, non può essere scartato (es. Telefono)
+    public bool isConsumable;
+    public bool isKeyItem;
+    public bool isStackable;
 }
