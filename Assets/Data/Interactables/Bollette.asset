@@ -15,8 +15,15 @@ MonoBehaviour:
   id: bollette
   displayName: Bollette
   characterPortrait: {fileID: 21300000, guid: 7003ad22f9a14c647bb3c99a31defd47, type: 3}
+  itemToGive: {fileID: 0}
+  destroyAfterInteraction: 0
   dialogueLines:
   - Devo ancora pagare la TARI
   - eh... avessi almeno un servizio decente
+  memoryVariants:
+  - requiredMemoryID: calendario
+    alternateLines:
+    - ...pago per rimanere con l'immondizia in casa
+  factToLearn: bollette
   requiredItem: {fileID: 0}
   rageModifier: 0

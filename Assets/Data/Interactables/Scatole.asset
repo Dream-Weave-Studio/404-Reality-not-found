@@ -19,5 +19,10 @@ MonoBehaviour:
   - Devo decidermi a buttare queste scatole!
   - "...per\xF2 possono sempre essermi utili"
   - "...s\xEC vabb\xE8 ma quando le uso..."
+  memoryVariants:
+  - requiredMemoryID: bollette
+    alternateLines:
+    - mph... altra roba
+  factToLearn: scatola
   requiredItem: {fileID: 0}
   rageModifier: 0

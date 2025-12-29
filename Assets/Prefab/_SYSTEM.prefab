@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &506989438053319321
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2769656562769696558}
+  - component: {fileID: 8895032803985873672}
+  - component: {fileID: 5435390221412303423}
+  - component: {fileID: 3847986674006558913}
+  - component: {fileID: 3232399755567779245}
+  - component: {fileID: 2419382692288173134}
+  - component: {fileID: 1146801473768830376}
+  m_Layer: 0
+  m_Name: _SYSTEM
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2769656562769696558
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506989438053319321}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 546.7014, y: 340.0675, z: 1.4923527}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8895032803985873672
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506989438053319321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8446dae2bcadb9640bc90a8c056e0021, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentState: 2
+  startState: 2
+  introFinished: 1
+--- !u!114 &5435390221412303423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506989438053319321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7f4d7b83613e67c47ba6061befd3cf36, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dialogPanel: {fileID: 0}
+  portraitImage: {fileID: 0}
+  dialogText: {fileID: 0}
+  typingSpeed: 0.03
+  displayDuration: 3
+--- !u!114 &3847986674006558913
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506989438053319321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: baadbbb77b1a1114d91b548b67d41a6c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  introPanel: {fileID: 0}
+  introCanvasGroup: {fileID: 0}
+  letterText: {fileID: 0}
+  introLines:
+  - Cosa pensi succederebbe se la tua vita fosse stata programmata da qualcun altro
+    prima ancora che tu nascessi?
+  - E cosa succederebbe se i tuoi genitori ti spingessero verso un futuro che non
+    hai mai sentito tuo?
+  - 'E poi quando sei ad un passo dall''ottenerlo, ti viene portato via da... una
+    banana? '
+  - ED IO CHE NE SO?
+  - CHIEDILO A RYO
+  - "Ryo, c\u2019\xE8 un nome che ti stanno passando addosso come fosse un programma:
+    elegante, preciso, pronto a seguire istruzioni."
+  - "Hai fatto tutto \u201Cgiusto\u201D: orari perfetti, sorriso calibrato, sacrifici
+    silenziosi. Eppure, dentro, qualcosa non resta al suo posto."
+  - 'Qualcosa che scalcia, che vuole uscire dal copione. '
+  - Non ti sto dicendo di tradire chi ti ha cresciuto...
+  - "...sto solo suggerendo che esiste un\u2019altra strada, e che forse \xE8 il
+    momento di cercarla..."
+  typingSpeed: 0.0003
+  fadeOutDuration: 2
+--- !u!114 &3232399755567779245
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506989438053319321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b1994a35b5c87874c9837b8570dd51ff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  objectivePanel: {fileID: 0}
+  objectiveText: {fileID: 0}
+  fadeDuration: 1
+--- !u!114 &2419382692288173134
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506989438053319321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0942cef895891a445ba554d9b699854d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  debugKnownFacts: []
+--- !u!114 &1146801473768830376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506989438053319321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a27b73b5fe3339e429447a41e9089ef9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

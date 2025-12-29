@@ -2,102 +2,177 @@ using UnityEngine;
 
 public class InteractableObject : MonoBehaviour, IInteractable
 {
-    [Header("Dati Standard (Default)")]
-    [Tooltip("Dati generici dell'oggetto (Nome, Icona, Frasi di base).")]
+    [Header("Dati")]
     public SO_Interactable interactableData;
 
-    // Indici separati per non confondere i dialoghi normali da quelli della quest
+    [Header("Setup Gerarchia")]
+    [Tooltip("Se questo script è su un figlio, trascina qui il Padre da nascondere. Se lo lasci vuoto, nasconderà se stesso.")]
+    public GameObject objectToHide;
+
+    // Indici per ciclare i dialoghi
     private int defaultLineIndex = 0;
     private int questLineIndex = 0;
+    private int variantLineIndex = 0; // Nuovo indice per le varianti
 
-    [Header("Quest Logic")]
-    [Tooltip("L'obiettivo che il giocatore DEVE avere attivo affinché questo oggetto faccia avanzare la storia.")]
+    // Teniamo traccia dell'ultima variante usata per non resettare l'indice a caso
+    private string lastUsedVariantID = "";
+
+    [Header("Quest Logic (Priorità Alta)")]
     public string requiredObjective;
-
-    [Tooltip("Il nuovo obiettivo da impostare dopo l'interazione.")]
     public string updateObjectiveTo;
-
-    [Header("Quest Dialogues (Override)")]
-    [Tooltip("Queste frasi verranno dette SOLO se l'obiettivo richiesto è attivo.")]
     [TextArea(3, 10)]
     public string[] questDialogueLines;
 
     public void Interact()
     {
-        // Controllo sicurezza dati base
-        if (interactableData == null)
-        {
-            Debug.LogError("Mancano i dati (SO) su questo oggetto: " + gameObject.name);
-            return;
-        }
+        if (interactableData == null) return;
 
-        // 1. VERIFICA STATO MISSIONE
-        // Controlliamo se siamo nel momento giusto della storia per attivare la logica speciale
-        bool isQuestStepActive = false;
-
-        // Se c'è un ObjectiveManager e abbiamo impostato un requisito...
-        if (ObjectiveManager.Instance != null && !string.IsNullOrEmpty(requiredObjective))
-        {
-            // ...controlliamo se l'obiettivo attuale è quello richiesto
-            if (ObjectiveManager.Instance.GetCurrentObjective() == requiredObjective)
-            {
-                isQuestStepActive = true;
-            }
-        }
-        // Caso speciale: Se requiredObjective è vuoto ma c'è un updateObjectiveTo, 
-        // significa che è il primo step di una quest (es. inizio gioco) -> Attiva sempre.
-        else if (string.IsNullOrEmpty(requiredObjective) && !string.IsNullOrEmpty(updateObjectiveTo))
-        {
-            isQuestStepActive = true;
-        }
-
-        // 2. SELEZIONE DEL DIALOGO
         string textToShow = "";
-        Sprite portraitToShow = interactableData.characterPortrait; // Usiamo sempre la faccia base (o puoi aggiungerne una override se serve)
+        // Default: usiamo il ritratto del SO. 
+        // Se volessi cambiarlo dinamicamente, lo faresti qui.
+        Sprite portrait = interactableData.characterPortrait;
 
-        // Se siamo nello step della Quest E abbiamo scritto dei dialoghi speciali per la quest...
+        // ---------------------------------------------------------
+        // FASE 1: CONTROLLO QUEST (Priorità Massima)
+        // ---------------------------------------------------------
+        bool isQuestStepActive = CheckQuestStatus();
+
         if (isQuestStepActive && questDialogueLines.Length > 0)
         {
-            // --- CASO QUEST: Usiamo le frasi speciali scritte nell'Inspector ---
+            // Siamo in una quest critica: usiamo le linee scritte nell'Inspector
             textToShow = questDialogueLines[questLineIndex];
 
-            // Gestione indice Quest (avanza solo nelle frasi quest)
-            questLineIndex++;
-            if (questLineIndex >= questDialogueLines.Length) questLineIndex = 0;
+            // Avanzamento indice
+            questLineIndex = (questLineIndex + 1) % questDialogueLines.Length;
+
+            // Aggiorna Obiettivo (Se necessario)
+            if (!string.IsNullOrEmpty(updateObjectiveTo) && ObjectiveManager.Instance != null)
+            {
+                if (ObjectiveManager.Instance.GetCurrentObjective() != updateObjectiveTo)
+                {
+                    ObjectiveManager.Instance.SetObjective(updateObjectiveTo);
+                }
+            }
+        }
+        // ---------------------------------------------------------
+        // FASE 2: CONTROLLO MEMORIA (Priorità Media)
+        // ---------------------------------------------------------
+        else
+        {
+            // Cerchiamo se c'è una variante attiva (es. Ho visto il calendario?) [cite: 19, 256]
+            DialogueVariant? activeVariant = GetActiveVariant();
+
+            if (activeVariant.HasValue)
+            {
+                // Trovata variante! Resettiamo indice se è cambiata la variante
+                if (lastUsedVariantID != activeVariant.Value.requiredMemoryID)
+                {
+                    variantLineIndex = 0;
+                    lastUsedVariantID = activeVariant.Value.requiredMemoryID;
+                }
+
+                string[] lines = activeVariant.Value.alternateLines;
+                if (lines.Length > 0)
+                {
+                    textToShow = lines[variantLineIndex];
+                    variantLineIndex = (variantLineIndex + 1) % lines.Length;
+                }
+            }
+            // ---------------------------------------------------------
+            // FASE 3: DEFAULT (Priorità Bassa)
+            // ---------------------------------------------------------
+            else
+            {
+                if (interactableData.dialogueLines.Length > 0)
+                {
+                    textToShow = interactableData.dialogueLines[defaultLineIndex];
+                    defaultLineIndex = (defaultLineIndex + 1) % interactableData.dialogueLines.Length;
+                }
+            }
+        }
+
+        // ---------------------------------------------------------
+        // FASE 4: OUTPUT & APPRENDIMENTO
+        // ---------------------------------------------------------
+
+        // Invia alla UI
+        if (DialogManager.Instance != null && !string.IsNullOrEmpty(textToShow))
+        {
+            DialogManager.Instance.ShowDialog(textToShow, portrait);
         }
         else
         {
-            // --- CASO NORMALE: Usiamo le frasi generiche del SO ---
-            // Questo succede se non è il momento della quest OPPURE se abbiamo già finito questo step
-            if (interactableData.dialogueLines.Length > 0)
-            {
-                textToShow = interactableData.dialogueLines[defaultLineIndex];
+            // Fallback se non c'è il manager
+            Debug.Log($"[{interactableData.displayName}]: {textToShow}");
+        }
 
-                // Gestione indice Default
-                defaultLineIndex++;
-                if (defaultLineIndex >= interactableData.dialogueLines.Length) defaultLineIndex = 0;
+        // Raccolta oggetti (se applicabile)
+        if (interactableData.itemToGive != null && InventoryManager.Instance != null)
+        {
+            // 1. Aggiungi all'inventario
+            InventoryManager.Instance.AddItem(interactableData.itemToGive);
+
+            // 2. Feedback (Opzionale: suono o messaggio a schermo)
+            Debug.Log($"Hai raccolto: {interactableData.itemToGive.itemName}");
+        }
+
+        // Impara il fatto (se questo oggetto insegna qualcosa) [cite: 9]
+        // Lo facciamo alla fine, così la PRIMA volta che clicchi leggi il default, 
+        // e solo dopo aver letto hai "imparato".
+        if (!string.IsNullOrEmpty(interactableData.factToLearn) && MemoryManager.Instance != null)
+        {
+            MemoryManager.Instance.SetFact(interactableData.factToLearn);
+        }
+
+        // RIMOZIONE
+        // Se è un oggetto da raccogliere (come il Telefono), deve sparire dalla scena
+        if (interactableData.destroyAfterInteraction)
+        {
+            // Caso A: Hai assegnato manualmente un padre
+            if (objectToHide != null)
+            {
+                objectToHide.SetActive(false);
+            }
+            // Caso B: Non hai assegnato nulla, spegne se stesso
+            else
+            {
+                gameObject.SetActive(false);
             }
         }
+    }
 
-        // 3. MOSTRA DIALOGO
-        if (DialogManager.Instance != null && !string.IsNullOrEmpty(textToShow))
+    // Helper per verificare lo stato della Quest (preso dal tuo script originale)
+    private bool CheckQuestStatus()
+    {
+        if (ObjectiveManager.Instance == null) return false;
+
+        // Caso 1: C'è un obiettivo richiesto specifico
+        if (!string.IsNullOrEmpty(requiredObjective))
         {
-            // Nota: Se il tuo DialogManager aggiornato non usa più 'portraitToShow' perché usa la Render Texture,
-            // rimuovi il secondo parametro qui sotto.
-            DialogManager.Instance.ShowDialog(textToShow, portraitToShow);
+            return ObjectiveManager.Instance.GetCurrentObjective() == requiredObjective;
+        }
+        // Caso 2: È uno start point (nessun requisito ma setta un nuovo obiettivo)
+        else if (!string.IsNullOrEmpty(updateObjectiveTo))
+        {
+            return true;
         }
 
-        Debug.Log($"[Interazione] {interactableData.displayName}: {textToShow} (Quest Active: {isQuestStepActive})");
+        return false;
+    }
 
-        // 4. AGGIORNAMENTO OBIETTIVO (Solo se eravamo nello step attivo e c'è un update da fare)
-        if (isQuestStepActive && !string.IsNullOrEmpty(updateObjectiveTo) && ObjectiveManager.Instance != null)
+    // Helper per cercare la variante corretta
+    private DialogueVariant? GetActiveVariant()
+    {
+        if (MemoryManager.Instance == null || interactableData.memoryVariants == null) return null;
+
+        // Cerchiamo nella lista delle varianti se ce n'è una soddisfatta
+        foreach (var variant in interactableData.memoryVariants)
         {
-            // Evitiamo di resettare l'obiettivo se è già quello giusto (opzionale, ma pulito)
-            if (ObjectiveManager.Instance.GetCurrentObjective() != updateObjectiveTo)
+            if (MemoryManager.Instance.CheckFact(variant.requiredMemoryID))
             {
-                ObjectiveManager.Instance.SetObjective(updateObjectiveTo);
-                Debug.Log($"[Quest] Obiettivo aggiornato a: '{updateObjectiveTo}'");
+                return variant; // Ritorna la prima variante valida trovata
             }
         }
+        return null;
     }
 }

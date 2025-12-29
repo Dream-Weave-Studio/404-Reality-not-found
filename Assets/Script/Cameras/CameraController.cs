@@ -16,11 +16,18 @@ public class CameraManager : MonoBehaviour
     public enum ViewMode { Side2_5D, Isometric }
     public ViewMode currentMode = ViewMode.Side2_5D;
 
-    private float targetZoom;
+    
     public float zoomSensitivity_mouse;
     public float zoomSensitivity_stick;
 
+    public float minZoom;
+    public float maxZoom;
+
     public float zoomLagSpeed = 10f; // Più basso = risposta più lenta
+
+
+    [Header("Debug")]
+    [SerializeField] float targetZoom;
 
     #endregion
 
@@ -75,7 +82,7 @@ public class CameraManager : MonoBehaviour
                 sensitivity *= zoomSensitivity_stick;
 
             targetZoom -= scrollInput * sensitivity;
-            targetZoom = Mathf.Clamp(targetZoom, 4f, 12f);
+            targetZoom = Mathf.Clamp(targetZoom, minZoom, maxZoom);
         }
     }
 
