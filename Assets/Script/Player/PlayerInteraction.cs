@@ -16,6 +16,9 @@ public class PlayerInteraction : MonoBehaviour
     /// Se null non c'è nessun oggetto con cui interagire.
     /// </summary>
     private Collider currentTarget;
+
+    // Serve per evitare di chiamare la UI ogni singolo frame
+    private bool isPromptActive = false;
     #endregion
 
     #region Ciclo di vita Unity (Enable/Disable)
@@ -30,6 +33,38 @@ public class PlayerInteraction : MonoBehaviour
         if (InputManager.Instance != null)
             InputManager.Instance.OnInteract -= HandleInteraction;
     }
+
+    // AGGIUNTA FONDAMENTALE: Controllo costante dello stato
+    void Update()
+    {
+        // Se non abbiamo un target, non c'è nulla da fare
+        if (currentTarget == null) return;
+
+        // 1. Controllo Stato: Siamo in Gameplay?
+        bool canInteract = GameManager.Instance.currentState == GameManager.GameState.Gameplay;
+
+        // 2. Gestione UI Dinamica
+        if (canInteract && !isPromptActive)
+        {
+            // Se siamo in gioco, ho un target, ma la UI è spenta -> ACCENDILA
+            // (Succede quando finisce l'intro e sei già sopra la sveglia)
+            InteractableObject objScript = currentTarget.GetComponent<InteractableObject>();
+            if (objScript != null && InteractionPromptUI.Instance != null)
+            {
+                InteractionPromptUI.Instance.ShowPrompt(objScript);
+                isPromptActive = true;
+            }
+        }
+        else if (!canInteract && isPromptActive)
+        {
+            // Se NON siamo in gioco (es. parte una cutscene), ma la UI è accesa -> SPEGNILA
+            if (InteractionPromptUI.Instance != null)
+            {
+                InteractionPromptUI.Instance.HidePrompt();
+                isPromptActive = false;
+            }
+        }
+    }
     #endregion
 
     #region Trigger di rilevamento oggetti interagibili
@@ -38,13 +73,6 @@ public class PlayerInteraction : MonoBehaviour
         if (other.CompareTag("Interactable"))
         {
             currentTarget = other;
-
-            InteractableObject objScript = other.GetComponent<InteractableObject>();
-            if (objScript != null && InteractionPromptUI.Instance != null)
-            {
-                // MODIFICA: Passiamo l'intero script, non solo il nome
-                InteractionPromptUI.Instance.ShowPrompt(objScript);
-            }
         }
     }
 
@@ -53,6 +81,8 @@ public class PlayerInteraction : MonoBehaviour
         if (other == currentTarget)
         {
             currentTarget = null;
+
+            isPromptActive = false; // Reset stato locale
 
             // Nascondi UI
             if (InteractionPromptUI.Instance != null)

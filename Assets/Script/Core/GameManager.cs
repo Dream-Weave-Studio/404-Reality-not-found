@@ -81,7 +81,7 @@ public class GameManager : MonoBehaviour
         // 2. Impostiamo il primo obiettivo
         if (ObjectiveManager.Instance != null)
         {
-            ObjectiveManager.Instance.SetObjective("TROVA IL TELEFONO");
+            ObjectiveManager.Instance.SetObjective("SVEGLIA_MATTINA");
         }
         // OPZIONALE: Auto-Salvataggio appena finisce l'intro
         // if (SaveManager.Instance != null) SaveManager.Instance.SaveGame();

@@ -50,7 +50,7 @@ public class ObjectiveManager : MonoBehaviour
     // Metodo helper per sapere a che punto siamo
     public string GetCurrentObjective()
     {
-        return objectiveText.text;
+        return currentObjectiveID;
     }
 
     // Metodo principale per cambiare obiettivo
