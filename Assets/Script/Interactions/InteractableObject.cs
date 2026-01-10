@@ -30,6 +30,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
         StartCoroutine(CheckPersistenceDelayed());
     }
 
+
     private System.Collections.IEnumerator CheckPersistenceDelayed()
     {
         // Aspetta 1 frame. Questo dà tempo al SaveManager di eseguire OnSceneLoaded
@@ -57,7 +58,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
     }
 
-    public void Interact()
+    public virtual void Interact()
     {
         if (interactableData == null) return;
 
