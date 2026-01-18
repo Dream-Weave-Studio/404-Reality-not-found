@@ -7516,7 +7516,7 @@ MonoBehaviour:
   interactableData: {fileID: 11400000, guid: 63fa8e39159d22541aa32f298b196268, type: 2}
   objectToHide: {fileID: 0}
   requiredObjective: VAI IN BAGNO A PRENDERE LE PILLOLE
-  updateObjectiveTo: PROSSIMO OBJECTIVE
+  updateObjectiveTo: OBBIETTIVO AGGIORNATO
   questDialogueLines:
   - Le ho finite!
 --- !u!65 &1960415111
