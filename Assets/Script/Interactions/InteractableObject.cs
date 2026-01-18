@@ -172,10 +172,18 @@ public class InteractableObject : MonoBehaviour, IInteractable
     {
         if (ObjectiveManager.Instance == null) return false;
 
+        // --- DEBUG ---
+        string current = ObjectiveManager.Instance.GetCurrentObjective();
+        Debug.Log($"[DEBUG QUEST] Oggetto: {gameObject.name} | Richiesto: '{requiredObjective}' | Attuale: '{current}'");
+
         // Caso 1: C'è un obiettivo richiesto specifico
         if (!string.IsNullOrEmpty(requiredObjective))
         {
-            return ObjectiveManager.Instance.GetCurrentObjective() == requiredObjective;
+            return string.Equals(
+                ObjectiveManager.Instance.GetCurrentObjective().Trim(),
+                requiredObjective.Trim(),
+                System.StringComparison.OrdinalIgnoreCase
+                );
         }
         // Caso 2: È uno start point (nessun requisito ma setta un nuovo obiettivo)
         else if (!string.IsNullOrEmpty(updateObjectiveTo))
