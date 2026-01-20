@@ -34,12 +34,8 @@ public class HealthUI : MonoBehaviour
 
     void Update()
     {
-        // Smooth movement
-        healthSlider.value = Mathf.Lerp(
-            healthSlider.value,
-            targetHealth,
-            Time.deltaTime * smoothSpeed
-        );
+        // Smooth per lo slider
+        healthSlider.value = Mathf.Lerp(healthSlider.value, targetHealth, Time.deltaTime * smoothSpeed);
 
         if (Input.GetKeyDown(KeyCode.H))
             target.Heal(10);
