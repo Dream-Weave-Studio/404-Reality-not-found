@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GameEntity : MonoBehaviour
@@ -6,15 +7,35 @@ public class GameEntity : MonoBehaviour
     [SerializeField] protected float maxHealth = 100f;
     protected float currentHealth;
 
-    protected virtual void Start()
+    // Evento per notificare la UI
+    public event Action<float, float> OnHealthChanged;
+
+    public float GetMaxHealth()
+    {
+        return maxHealth;
+    }
+
+    public float GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+
+    protected virtual void Awake()
     {
         currentHealth = maxHealth;
+    }
+    protected virtual void Start()
+    {
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
     public virtual void TakeDamage(float damageAmount)
     {
         currentHealth -= damageAmount;
         Debug.Log(gameObject.name + " ha subito danno. Vita rimanente: " + currentHealth);
+
+
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
         if (currentHealth <= 0)
         {
@@ -32,5 +53,7 @@ public class GameEntity : MonoBehaviour
     {
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 }
