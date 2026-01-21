@@ -5,10 +5,14 @@ using UnityEngine.UI;
 
 public class HealthUI : MonoBehaviour
 {
+    [Header("UI References")]
     [SerializeField] private Slider healthSlider;
+
+    [Header("Settings")]
     [SerializeField] private GameEntity target;
     [SerializeField] private float smoothSpeed = 5f;
 
+    private Coroutine updateCoroutine;
     private float targetHealth;
 
     void Start()
@@ -16,31 +20,51 @@ public class HealthUI : MonoBehaviour
         if (target == null)
         {
             Debug.LogError("HealthUI: Target non assegnato");
-            return;
+            // Tenta di trovare il player se non assegnato, utile per setup rapidi
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null) target = player.GetComponent<GameEntity>();
         }
 
-        target.OnHealthChanged += OnHealthChanged;
+        if (target != null) 
+        {
+            // Iscrizione all'evento
+            target.OnHealthChanged += UpdateHealthBar;
 
-        healthSlider.maxValue = target.GetMaxHealth();
-        healthSlider.value = target.GetCurrentHealth();
-        targetHealth = healthSlider.value;
+            // Inizializzazione immediata senza animazione all'avvio
+            healthSlider.maxValue = target.GetMaxHealth();
+            healthSlider.value = target.GetCurrentHealth();
+        }
+        else
+        {
+            Debug.LogError("HealthUI: Target non assegnato!");
+        }
+    }
+    void OnDestroy()
+    {
+        // BEST PRACTICE: Disiscriversi sempre dagli eventi per evitare errori quando si cambia scena
+        if (target != null)
+        {
+            target.OnHealthChanged -= UpdateHealthBar;
+        }
     }
 
-    void OnHealthChanged(float currentHealth, float maxHealth)
+    void UpdateHealthBar(float currentHealth, float maxHealth)
     {
         healthSlider.maxValue = maxHealth;
-        targetHealth = currentHealth;
+
+        // Se c'è già un'animazione in corso, la fermiamo e ne facciamo partire una nuova
+        if (updateCoroutine != null) StopCoroutine(updateCoroutine);
+        updateCoroutine = StartCoroutine(AnimateHealth(currentHealth));
     }
 
-    void Update()
+    // Coroutine per l'animazione: sostituisce l'Update() costante
+    IEnumerator AnimateHealth(float targetValue)
     {
-        // Smooth per lo slider
-        healthSlider.value = Mathf.Lerp(healthSlider.value, targetHealth, Time.deltaTime * smoothSpeed);
-
-        if (Input.GetKeyDown(KeyCode.H))
-            target.Heal(10);
-
-        if (Input.GetKeyDown(KeyCode.J))
-            target.TakeDamage(10);
+        while (Mathf.Abs(healthSlider.value - targetValue) > 0.01f)
+        {
+            healthSlider.value = Mathf.Lerp(healthSlider.value, targetValue, Time.deltaTime * smoothSpeed);
+            yield return null; // Aspetta il frame successivo
+        }
+        healthSlider.value = targetValue; // Assicura il valore finale esatto
     }
 }
