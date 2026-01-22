@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class InteractableObject : MonoBehaviour, IInteractable
@@ -17,6 +18,11 @@ public class InteractableObject : MonoBehaviour, IInteractable
     // Teniamo traccia dell'ultima variante usata per non resettare l'indice a caso
     private string lastUsedVariantID = "";
 
+    [Header("Reazioni Modulari")]
+    // [NUOVO] Lista di reazioni che verranno eseguite all'interazione
+    [Tooltip("Lista di reazioni fisiche. Se vuota, cercherà automaticamente componenti 'InteractionReaction' su questo oggetto.")]
+    public List<InteractionReaction> reactions = new List<InteractionReaction>();
+
     [Header("Quest Logic (Priorità Alta)")]
     public string requiredObjective;
     public string updateObjectiveTo;
@@ -27,6 +33,11 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void OnEnable()
     {
+        // [NUOVO] Popolamento automatico della lista se vuota
+        if (reactions.Count == 0)
+        {
+            reactions.AddRange(GetComponents<InteractionReaction>());
+        }
         StartCoroutine(CheckPersistenceDelayed());
     }
 
@@ -129,6 +140,13 @@ public class InteractableObject : MonoBehaviour, IInteractable
         // ---------------------------------------------------------
         // FASE 4: OUTPUT & APPRENDIMENTO
         // ---------------------------------------------------------
+
+        // [NUOVO] ESECUZIONE REAZIONI
+        // Itera su tutte le reazioni configurate ed esegue il metodo React
+        foreach (var reaction in reactions)
+        {
+            reaction.React(this.gameObject);
+        }
 
         // Invia alla UI
         if (DialogManager.Instance != null && !string.IsNullOrEmpty(textToShow))
