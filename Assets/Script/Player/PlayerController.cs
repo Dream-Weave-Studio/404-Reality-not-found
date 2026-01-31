@@ -42,6 +42,15 @@ public class PlayerController : GameEntity
     void Update()
     {
         stateMachine.UpdateState();
+
+        // Aggiorna il parametro float per Blend del BlendTree
+        if (animator != null && movementComponent != null)
+        {
+            float normalized = 0f;
+            if (movementComponent.MaxSpeed > 0f)
+                normalized = Mathf.Clamp01(movementComponent.CurrentSpeed / movementComponent.MaxSpeed);
+            animator.SetFloat("Blend", normalized);
+        }
     }
 
     #endregion

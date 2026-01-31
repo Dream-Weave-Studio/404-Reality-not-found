@@ -1,12 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
 public class MovementComponent : MonoBehaviour
 {
     [Header("Velocità")]
     public float walkSpeed = 3f;
     public float runSpeed = 6f;
+
+    //Velocità per il Blend Tree public
+    public float CurrentSpeed => HasMovementInput() ? (isRunning ? runSpeed : walkSpeed) : 0f; 
+    public float MaxSpeed => Mathf.Max(walkSpeed, runSpeed);
 
     private Vector2 inputDirection;
     private bool isRunning;

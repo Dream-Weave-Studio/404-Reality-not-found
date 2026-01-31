@@ -6,9 +6,15 @@ public class GameEntity : MonoBehaviour
     [SerializeField] protected float maxHealth = 100f;
     protected float currentHealth;
 
+    // Riferimento centralizzato all'Animator
+    protected Animator animator;
+
     protected virtual void Start()
     {
         currentHealth = maxHealth;
+
+        // Per l'Animator se presente sullo stesso GameObject
+        animator = GetComponent<Animator>();
     }
 
     public virtual void TakeDamage(float damageAmount)
