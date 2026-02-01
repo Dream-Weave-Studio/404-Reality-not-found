@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class PlayerController : GameEntity
@@ -11,6 +11,9 @@ public class PlayerController : GameEntity
     [HideInInspector] public IdleState idleState;
     [HideInInspector] public WalkingState walkingState;
     [HideInInspector] public RunningState runningState;
+
+    private int blendHash;
+
     #endregion
 
     #region Unity Methods (Start, Update)
@@ -21,13 +24,13 @@ public class PlayerController : GameEntity
 
         if (InputManager.Instance == null)
         {
-            Debug.LogError("InputManager.Instance � null!");
+            Debug.LogError("InputManager.Instance è null!");
             return;
         }
 
         if (movementComponent == null)
         {
-            Debug.LogError("MovementComponent non � assegnato nell'Inspector!");
+            Debug.LogError("MovementComponent non è assegnato nell'Inspector!");
             return;
         }
 
@@ -37,11 +40,23 @@ public class PlayerController : GameEntity
 
         stateMachine = new StateMachineController();
         stateMachine.Initialize(idleState);
+
+        blendHash = Animator.StringToHash("Blend");
     }
 
     void Update()
     {
         stateMachine.UpdateState();
+
+        // Aggiorna il parametro float per Blend del BlendTree
+        if (animator != null && movementComponent != null)
+        {
+            float normalized = 0f;
+            if (movementComponent.MaxSpeed > 0f)
+                normalized = Mathf.Clamp01(movementComponent.CurrentSpeed / movementComponent.MaxSpeed);
+            
+            animator.SetFloat(blendHash, normalized);  // ← Usa hash invece di stringa
+        }
     }
 
     #endregion
@@ -56,18 +71,8 @@ public class PlayerController : GameEntity
 
     
 
-    public bool HasMovementInput()
-    {
-        return movementComponent.HasMovementInput();
-    }
-
-    public bool IsRunningInput()
-    {
-        return movementComponent.IsRunningInput();
-    }
-
-    public void HandleIsometricMovement()
-    {
-        movementComponent.HandleIsometricMovement();
-    }
+    public bool HasMovementInput() => movementComponent.HasMovementInput();
+    public bool IsRunningInput() => movementComponent.IsRunningInput();
+    public void HandleIsometricMovement() => movementComponent.HandleIsometricMovement();
+    
 }
