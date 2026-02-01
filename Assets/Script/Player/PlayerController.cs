@@ -11,6 +11,9 @@ public class PlayerController : GameEntity
     [HideInInspector] public IdleState idleState;
     [HideInInspector] public WalkingState walkingState;
     [HideInInspector] public RunningState runningState;
+
+    private int blendHash;
+
     #endregion
 
     #region Unity Methods (Start, Update)
@@ -37,6 +40,8 @@ public class PlayerController : GameEntity
 
         stateMachine = new StateMachineController();
         stateMachine.Initialize(idleState);
+
+        blendHash = Animator.StringToHash("Blend");
     }
 
     void Update()
@@ -49,7 +54,8 @@ public class PlayerController : GameEntity
             float normalized = 0f;
             if (movementComponent.MaxSpeed > 0f)
                 normalized = Mathf.Clamp01(movementComponent.CurrentSpeed / movementComponent.MaxSpeed);
-            animator.SetFloat("Blend", normalized);
+            
+            animator.SetFloat(blendHash, normalized);  // ? Usa hash invece di stringa
         }
     }
 
@@ -65,18 +71,8 @@ public class PlayerController : GameEntity
 
     
 
-    public bool HasMovementInput()
-    {
-        return movementComponent.HasMovementInput();
-    }
-
-    public bool IsRunningInput()
-    {
-        return movementComponent.IsRunningInput();
-    }
-
-    public void HandleIsometricMovement()
-    {
-        movementComponent.HandleIsometricMovement();
-    }
+    public bool HasMovementInput() => movementComponent.HasMovementInput();
+    public bool IsRunningInput() => movementComponent.IsRunningInput();
+    public void HandleIsometricMovement() => movementComponent.HandleIsometricMovement();
+    
 }
