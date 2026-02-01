@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 
 public class PlayerController : GameEntity
@@ -24,13 +24,13 @@ public class PlayerController : GameEntity
 
         if (InputManager.Instance == null)
         {
-            Debug.LogError("InputManager.Instance � null!");
+            Debug.LogError("InputManager.Instance è null!");
             return;
         }
 
         if (movementComponent == null)
         {
-            Debug.LogError("MovementComponent non � assegnato nell'Inspector!");
+            Debug.LogError("MovementComponent non è assegnato nell'Inspector!");
             return;
         }
 
@@ -55,7 +55,7 @@ public class PlayerController : GameEntity
             if (movementComponent.MaxSpeed > 0f)
                 normalized = Mathf.Clamp01(movementComponent.CurrentSpeed / movementComponent.MaxSpeed);
             
-            animator.SetFloat(blendHash, normalized);  // ? Usa hash invece di stringa
+            animator.SetFloat(blendHash, normalized);  // ← Usa hash invece di stringa
         }
     }
 
