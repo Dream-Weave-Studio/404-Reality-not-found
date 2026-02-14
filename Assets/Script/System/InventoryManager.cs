@@ -8,6 +8,8 @@ using UnityEditor;
 public class InventoryManager : MonoBehaviour
 {
     public static InventoryManager Instance;
+    public event System.Action OnInventoryChanged;
+
 
     [Header("Stato Corrente")]
     // Gli oggetti che il player ha in tasca ORA
@@ -46,6 +48,7 @@ public class InventoryManager : MonoBehaviour
         inventory.Add(item);
         Debug.Log($"[Inventario] Aggiunto: {item.itemName}");
 
+        OnInventoryChanged?.Invoke();
         // Qui in futuro aggiornerai la UI:
         // UIManager.Instance.UpdateInventoryUI();
     }
@@ -57,6 +60,8 @@ public class InventoryManager : MonoBehaviour
         {
             inventory.Remove(itemToRemove);
             Debug.Log($"[Inventario] Rimosso: {itemToRemove.itemName}");
+            OnInventoryChanged?.Invoke();
+
         }
     }
 
