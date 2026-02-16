@@ -1,15 +1,9 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using static UnityEditor.Progress;
-
-public class TestAddItem : InteractableObject
+public class PickUpItem : InteractableObject
 {
     public SO_Item testItem;
 
     public override void Interact()
     {
-        // Chiama eventuale logica base (se serve dialogo ecc.)
         base.Interact();
 
         if (InventoryManager.Instance != null)
