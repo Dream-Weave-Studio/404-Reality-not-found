@@ -2,15 +2,15 @@ using UnityEngine;
 
 public class MovementComponent : MonoBehaviour
 {
-    [Header("Velocità")]
+    [Header("VelocitÃ ")]
     public float walkSpeed = 3f;
     public float runSpeed = 6f;
 
     [Header("Rotazione")]
-    [Tooltip("Velocità di rotazione del personaggio verso la direzione di movimento")]
+    [Tooltip("VelocitÃ  di rotazione del personaggio verso la direzione di movimento")]
     public float rotationSpeed = 10f;
 
-    // Proprietà pubbliche per il Blend Tree
+    // ProprietÃ  pubbliche per il Blend Tree
     public float CurrentSpeed => HasMovementInput() ? (isRunning ? runSpeed : walkSpeed) : 0f;
     public float MaxSpeed => Mathf.Max(walkSpeed, runSpeed);
 
@@ -22,7 +22,7 @@ public class MovementComponent : MonoBehaviour
     {
         if (InputManager.Instance == null)
         {
-            Debug.LogError("InputManager.Instance è null! MovementComponent non può " +
+            Debug.LogError("InputManager.Instance Ã¨ null! MovementComponent non puÃ² " +
                           "registrarsi agli eventi.", this);
             return;
         }
@@ -57,7 +57,7 @@ public class MovementComponent : MonoBehaviour
         if (rotatedInput != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(rotatedInput);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation,rotationSpeed * Time.deltaTime);
         }
     }
     #endregion
@@ -91,9 +91,10 @@ public class MovementComponent : MonoBehaviour
 
     private void HandleRunToggle(bool isRunning)
     {
+        // AGGIUNTA: Stesso controllo per la corsa
         if (GameManager.Instance != null && GameManager.Instance.currentState != GameManager.GameState.Gameplay)
         {
-            this.isRunning = false;
+            this.isRunning = false; // Forza la camminata
             return;
         }
 
