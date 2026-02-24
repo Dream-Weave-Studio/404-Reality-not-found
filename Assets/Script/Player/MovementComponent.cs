@@ -2,15 +2,15 @@ using UnityEngine;
 
 public class MovementComponent : MonoBehaviour
 {
-    [Header("Velocità")]
+    [Header("VelocitÃ ")]
     public float walkSpeed = 3f;
     public float runSpeed = 6f;
 
     [Header("Rotazione")]
-    [Tooltip("Velocità di rotazione del personaggio verso la direzione di movimento")]
+    [Tooltip("VelocitÃ  di rotazione del personaggio verso la direzione di movimento")]
     public float rotationSpeed = 10f;
 
-    // Proprietà pubbliche per il Blend Tree
+    // ProprietÃ  pubbliche per il Blend Tree
     public float CurrentSpeed => HasMovementInput() ? (isRunning ? runSpeed : walkSpeed) : 0f;
     public float MaxSpeed => Mathf.Max(walkSpeed, runSpeed);
 
@@ -22,7 +22,7 @@ public class MovementComponent : MonoBehaviour
     {
         if (InputManager.Instance == null)
         {
-            Debug.LogError("InputManager.Instance è null! MovementComponent non può " +
+            Debug.LogError("InputManager.Instance Ã¨ null! MovementComponent non puÃ² " +
                           "registrarsi agli eventi.", this);
             return;
         }

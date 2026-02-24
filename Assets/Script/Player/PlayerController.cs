@@ -6,7 +6,7 @@ public class PlayerController : GameEntity
     [SerializeField] private MovementComponent movementComponent;
 
     #region Variabili e componenti
-    
+
     private StateMachineController stateMachine;
     [HideInInspector] public IdleState idleState;
     [HideInInspector] public WalkingState walkingState;
@@ -20,7 +20,7 @@ public class PlayerController : GameEntity
 
     protected override void Start()
     {
-        base.Start(); 
+        base.Start();
 
         if (InputManager.Instance == null)
         {
@@ -54,7 +54,7 @@ public class PlayerController : GameEntity
             float normalized = 0f;
             if (movementComponent.MaxSpeed > 0f)
                 normalized = Mathf.Clamp01(movementComponent.CurrentSpeed / movementComponent.MaxSpeed);
-            
+
             animator.SetFloat(blendHash, normalized);  // ← Usa hash invece di stringa
         }
     }
@@ -69,10 +69,9 @@ public class PlayerController : GameEntity
     }
     #endregion
 
-    
+
 
     public bool HasMovementInput() => movementComponent.HasMovementInput();
     public bool IsRunningInput() => movementComponent.IsRunningInput();
     public void HandleIsometricMovement() => movementComponent.HandleIsometricMovement();
-    
 }
