@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class MovementComponent : MonoBehaviour
@@ -8,23 +6,40 @@ public class MovementComponent : MonoBehaviour
     public float walkSpeed = 3f;
     public float runSpeed = 6f;
 
+    [Header("Rotazione")]
+    [Tooltip("Velocità di rotazione del personaggio verso la direzione di movimento")]
+    public float rotationSpeed = 10f;
+
+    // Proprietà pubbliche per il Blend Tree
+    public float CurrentSpeed => HasMovementInput() ? (isRunning ? runSpeed : walkSpeed) : 0f;
+    public float MaxSpeed => Mathf.Max(walkSpeed, runSpeed);
+
     private Vector2 inputDirection;
     private bool isRunning;
 
     #region Unity Methods (Start, Update, OnEnable)
     void OnEnable()
     {
+        if (InputManager.Instance == null)
+        {
+            Debug.LogError("InputManager.Instance è null! MovementComponent non può " +
+                          "registrarsi agli eventi.", this);
+            return;
+        }
+
         InputManager.Instance.OnMove += HandleMoveInput;
         InputManager.Instance.OnRun += HandleRunToggle;
     }
 
     void OnDisable()
     {
-        InputManager.Instance.OnMove -= HandleMoveInput;
-        InputManager.Instance.OnRun -= HandleRunToggle;
+        // Defensive: controlla se esiste prima di de-registrare
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.OnMove -= HandleMoveInput;
+            InputManager.Instance.OnRun -= HandleRunToggle;
+        }
     }
-
-    
     #endregion
 
     #region Movimento Isometrico
@@ -42,7 +57,7 @@ public class MovementComponent : MonoBehaviour
         if (rotatedInput != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(rotatedInput);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, 10f * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }
     #endregion
@@ -76,10 +91,9 @@ public class MovementComponent : MonoBehaviour
 
     private void HandleRunToggle(bool isRunning)
     {
-        // AGGIUNTA: Stesso controllo per la corsa
         if (GameManager.Instance != null && GameManager.Instance.currentState != GameManager.GameState.Gameplay)
         {
-            this.isRunning = false; // Forza la camminata
+            this.isRunning = false;
             return;
         }
 

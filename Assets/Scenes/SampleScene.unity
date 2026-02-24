@@ -1709,7 +1709,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3f6d7dbca233405439db71257e5100ff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  player: {fileID: 1677134063}
+  player: {fileID: 434306504}
   wallLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -2572,6 +2572,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   width: 0.005
+--- !u!4 &434306504 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+    type: 3}
+  m_PrefabInstance: {fileID: 1662740527}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &441283637 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7750397243111347764, guid: d26b68d5e4a4b264bbc3cd108e2ff3ec,
@@ -10432,6 +10438,74 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   width: 0.005
+--- !u!1001 &1662740527
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 9.22
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 1.483
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 10.19
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 180
+      objectReference: {fileID: 0}
+    - target: {fileID: 1839092614962282761, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8463835389797379032, guid: d3fe699214f413b47939b2c8f35db57b,
+        type: 3}
+      propertyPath: m_Name
+      value: Player_def
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: d3fe699214f413b47939b2c8f35db57b, type: 3}
 --- !u!1 &1668855491 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4492085909379848934, guid: b28b05da4d3f72b45ba4bb38c8af2001,
@@ -10496,7 +10570,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!136 &1677134060
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -10653,6 +10727,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   walkSpeed: 3
   runSpeed: 6
+  rotationSpeed: 10
 --- !u!114 &1677134068
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16748,7 +16823,7 @@ PrefabInstance:
     - target: {fileID: 8895032803985873672, guid: 3cb3be45f33e99d449c1b490041565c2,
         type: 3}
       propertyPath: introFinished
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -17052,3 +17127,4 @@ SceneRoots:
   - {fileID: 1440202945}
   - {fileID: 1292515459}
   - {fileID: 710252359}
+  - {fileID: 1662740527}
