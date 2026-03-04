@@ -14,11 +14,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: calendario
   displayName: Calendario
-  characterPortrait: {fileID: 21300000, guid: 7003ad22f9a14c647bb3c99a31defd47, type: 3}
+  characterPortrait: {fileID: 21300000, guid: cf7e2cba3fd3843408bf914fe0c79757, type: 3}
+  interlocutorPortrait: {fileID: 0}
   dialogueLines:
-  - "\xE8 il calendario della raccolta differenziata..."
-  memoryVariants: []
-  factToLearn: calendario
+  - "Il netturbino passa settimana prossima, gi\xE0 lo so."
+  memoryVariants:
+  - requiredMemoryID: seen_calendario
+    alternateLines:
+    - "Il netturbino passa settimana prossima, gi\xE0 lo so."
+  factToLearn: seen_calendario
   itemToGive: {fileID: 0}
   destroyAfterInteraction: 0
   requiredItem: {fileID: 0}

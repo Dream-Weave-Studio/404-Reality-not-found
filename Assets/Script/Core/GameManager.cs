@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using System;
 
 public class GameManager : MonoBehaviour
@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
     {
         Initialization, // Caricamento scena
         IntroSequence,  // Schermo nero + Lettera Hacker
+        WakingUp,       // Ryo si sveglia e si alza
         Gameplay,       // Ryo si muove e interagisce
         Cutscene,       // Eventi bloccanti (es. Telefonata Capo)
         Paused          // Menu di pausa
@@ -51,13 +52,13 @@ public class GameManager : MonoBehaviour
         currentState = newState;
         Debug.Log($"Game State cambiato in: {newState}");
 
-        // Notifica tutti i sistemi (UI, Input, Audio) che lo stato Ë cambiato
+        // Notifica tutti i sistemi (UI, Input, Audio) che lo stato √® cambiato
         OnStateChanged?.Invoke(newState);
 
         switch (currentState)
         {
             case GameState.IntroSequence:
-                // Non serve fare nulla qui, l'IntroController si attiver‡ da solo
+                // Non serve fare nulla qui, l'IntroController si attiver√† da solo
                 // leggendo lo stato nel suo Start()
                 break;
             case GameState.Gameplay:
@@ -73,16 +74,8 @@ public class GameManager : MonoBehaviour
 
     public void EndIntro()
     {
-        introFinished = true; // Segniamo che Ë finita per sempre
-
-        // 1. Cambiamo stato per sbloccare i movimenti del player
-        ChangeState(GameState.Gameplay);
-
-        // 2. Impostiamo il primo obiettivo
-        if (ObjectiveManager.Instance != null)
-        {
-            ObjectiveManager.Instance.SetObjective("SVEGLIA_MATTINA");
-        }
+        introFinished = true;
+        ChangeState(GameState.Gameplay); // ‚Üê sblocca il movimento dopo il fade
         // OPZIONALE: Auto-Salvataggio appena finisce l'intro
         // if (SaveManager.Instance != null) SaveManager.Instance.SaveGame();
     }
@@ -94,13 +87,17 @@ public class GameManager : MonoBehaviour
 
         if (introFinished)
         {
-            // Se l'intro Ë gi‡ fatta, forza il gameplay immediato
+            // Se l'intro √® gi√† fatta, forza il gameplay immediato
             ChangeState(GameState.Gameplay);
         }
         else
         {
-            // Se non Ë fatta, lancia l'intro
+            // Se non √® fatta, lancia l'intro
             ChangeState(GameState.IntroSequence);
         }
+    }
+    public void OnWakeUpAnimationFinished()
+    {
+        ChangeState(GameState.Gameplay);
     }
 }

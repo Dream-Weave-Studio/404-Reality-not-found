@@ -29,19 +29,22 @@ public class CameraObstructionFader : MonoBehaviour
         Vector3 dir = targetPos - transform.position;
         float dist = dir.magnitude;
 
-        debugRayStart = transform.position;
-        debugRayEnd = targetPos;
-
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, rayRadius, dir, dist, wallLayer);
-        isHitDebug = hits.Length > 0;
+        RaycastHit[] hits = Physics.SphereCastAll(
+            transform.position, rayRadius, dir, dist, wallLayer
+        );
 
         foreach (RaycastHit hit in hits)
         {
             WallFader fader = hit.collider.GetComponent<WallFader>();
             if (fader == null) fader = hit.collider.GetComponentInParent<WallFader>();
-            if (fader == null) fader = hit.collider.gameObject.AddComponent<WallFader>();
 
-            // Passiamo TUTTI i parametri visivi ogni frame
+            if (fader == null)
+            {
+                Debug.LogWarning($"[CameraObstructionFader] {hit.collider.name} " +
+                                 "è sul wallLayer ma non ha WallFader. Aggiungilo in Editor.");
+                continue; // Salta, non creare nulla
+            }
+
             fader.StayOpen(targetPos, fadeSpeed, closeSpeed, holeRadius, pixelDensity);
         }
     }

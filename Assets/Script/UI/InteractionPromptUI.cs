@@ -1,4 +1,4 @@
-using UnityEngine;
+Ôªøusing UnityEngine;
 using TMPro;
 
 public class InteractionPromptUI : MonoBehaviour
@@ -14,8 +14,15 @@ public class InteractionPromptUI : MonoBehaviour
     [Header("Settings")]
     public Vector3 offset = new Vector3(0, 2f, 0); // Quanto in alto sopra l'oggetto deve stare (es. 2 metri)
 
+    [Header("References")]
+    public Canvas rootCanvas;
+
+    [Header("Target")]
+    public Transform player;
+
     private Transform targetTransform; // L'oggetto che stiamo guardando (es. il Telefono)
     private Camera mainCam;
+    private bool isStaticMode = false;
 
     private void Awake()
     {
@@ -23,15 +30,17 @@ public class InteractionPromptUI : MonoBehaviour
         {
             Instance = this;
             // NON usare DontDestroyOnLoad per la UI se possibile, 
-            // ma se lo usi, devi aggiornare i riferimenti cosÏ:
+            // ma se lo usi, devi aggiornare i riferimenti cos√¨:
         }
         else
         {
-            // Se esiste gi‡ un manager UI, aggiornagli i riferimenti
+            // Se esiste gi√† un manager UI, aggiornagli i riferimenti
             Instance.promptPanel = this.promptPanel;
             Instance.buttonText = this.buttonText;
             Instance.objectNameText = this.objectNameText;
             Instance.panelRect = this.panelRect;
+            Instance.player = this.player;
+            Instance.rootCanvas = this.rootCanvas;
 
             // Spegni il prompt per sicurezza
             Instance.HidePrompt();
@@ -49,25 +58,32 @@ public class InteractionPromptUI : MonoBehaviour
 
     private void LateUpdate()
     {
-        // 1. Controlli di sicurezza base
-        if (promptPanel == null) return;
+        if (promptPanel == null || isStaticMode) return;
+
         if (targetTransform == null || !targetTransform.gameObject.activeInHierarchy)
         {
             HidePrompt();
             return;
         }
 
-        // 2. FIX CAMERA PERSA: Se la camera Ë nulla (cambio scena), ritroviamola!
         if (mainCam == null) mainCam = Camera.main;
-
-        // Se ancora non c'Ë una camera (es. caricamento in corso), esci
         if (mainCam == null) return;
 
-        // 3. Posizionamento
         if (promptPanel.activeSelf)
         {
+            // 1. Converti posizione world in pixel screen
             Vector3 screenPos = mainCam.WorldToScreenPoint(targetTransform.position + offset);
-            panelRect.position = screenPos;
+
+            // 2. Converti pixel screen in coordinate locali del Canvas
+            // null √® OBBLIGATORIO per Screen Space Overlay
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(
+                rootCanvas.GetComponent<RectTransform>(),
+                screenPos,
+                null,
+                out Vector2 localPoint
+            );
+
+            panelRect.anchoredPosition = localPoint;
         }
     }
 
@@ -76,19 +92,36 @@ public class InteractionPromptUI : MonoBehaviour
     {
         if (interactableObj == null) return;
 
-        targetTransform = interactableObj.transform; // Agganciamo il target
-        objectNameText.text = interactableObj.interactableData.displayName;
+        isStaticMode = false;
 
+        targetTransform = player;
+
+        objectNameText.text = interactableObj.interactableData.displayName;
         promptPanel.SetActive(true);
 
-        // Aggiorna icona tasto iniziale
+        if (InputManager.Instance != null)
+            UpdateButtonIcon(InputManager.Instance.currentInputType);
+    }
+
+    public void ShowPromptStatic(string message)
+    {
+        isStaticMode = true;
+        targetTransform = null;
+
+        objectNameText.text = message;  // "Premi E per zittire Lexa" / "Premi X per zittire Lexa"
+        panelRect.anchoredPosition = Vector2.zero;
+        promptPanel.SetActive(true);
+
+        // Aggiorna subito l'icona con il dispositivo corrente
         if (InputManager.Instance != null)
             UpdateButtonIcon(InputManager.Instance.currentInputType);
     }
 
     public void HidePrompt()
     {
+        isStaticMode = false; // Reset anche della modalit√† statica
         targetTransform = null; // Sganciamo il target
+        objectNameText.text = "";
         promptPanel.SetActive(false);
     }
 

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: dinostrabico
   displayName: Dinostrabico
-  characterPortrait: {fileID: 0}
+  characterPortrait: {fileID: 21300000, guid: cf7e2cba3fd3843408bf914fe0c79757, type: 3}
   dialogueLines:
   - "buongiorno anche a te, Dinostrabico\u2026 ti vedo pi\xF9 fuso di ieri, prima
     o poi ci arriver\xF2 anche io al tuo stato\u2026"

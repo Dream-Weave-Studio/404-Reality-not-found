@@ -88,17 +88,25 @@ public class InputManager : MonoBehaviour
         controls.Enable();
 
 
-        controls.Player.Move.performed += ctx => OnMove?.Invoke(ctx.ReadValue<Vector2>());
+        controls.Player.Move.performed += ctx => {
+            if (CanProcessInput()) OnMove?.Invoke(ctx.ReadValue<Vector2>());
+        };
         controls.Player.Move.canceled += ctx => OnMove?.Invoke(Vector2.zero);
 
 
-        controls.Player.Run.performed += ctx => OnRun?.Invoke(true);
+        controls.Player.Run.performed += ctx =>
+        {
+            if (CanProcessInput()) OnRun?.Invoke(ctx.ReadValueAsButton());
+        };
         controls.Player.Run.canceled += ctx => OnRun?.Invoke(false);
 
 
         controls.Player.Interact.performed += ctx => OnInteract?.Invoke();
 
-        controls.Camera.Zoom.performed += ctx => OnZoom?.Invoke(ctx.ReadValue<float>());
+        controls.Camera.Zoom.performed += ctx =>
+        {
+            if (CanProcessInput()) OnZoom?.Invoke(ctx.ReadValue<float>());
+        };
     }
 
     private void OnDisable()
@@ -109,6 +117,12 @@ public class InputManager : MonoBehaviour
         {
             controls.Disable();
         }
+    }
+    private bool CanProcessInput()
+    {
+        if (GameManager.Instance == null) return true;
+        // Blocca TUTTO se non siamo in Gameplay o se siamo in Intro/WakingUp
+        return GameManager.Instance.currentState == GameManager.GameState.Gameplay;
     }
 
     #endregion

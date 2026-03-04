@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+Ôªøusing System.Collections.Generic;
 using UnityEngine;
 
 public class InteractableObject : MonoBehaviour, IInteractable
@@ -7,65 +7,63 @@ public class InteractableObject : MonoBehaviour, IInteractable
     public SO_Interactable interactableData;
 
     [Header("Setup Gerarchia")]
-    [Tooltip("Se questo script Ë su un figlio, trascina qui il Padre da nascondere. Se lo lasci vuoto, nasconder‡ se stesso.")]
     public GameObject objectToHide;
 
-    // Indici per ciclare i dialoghi
     private int defaultLineIndex = 0;
     private int questLineIndex = 0;
-    private int variantLineIndex = 0; // Nuovo indice per le varianti
-
-    // Teniamo traccia dell'ultima variante usata per non resettare l'indice a caso
+    private int variantLineIndex = 0;
     private string lastUsedVariantID = "";
 
     [Header("Reazioni Modulari")]
-    // [NUOVO] Lista di reazioni che verranno eseguite all'interazione
-    [Tooltip("Lista di reazioni fisiche. Se vuota, cercher‡ automaticamente componenti 'InteractionReaction' su questo oggetto.")]
     public List<InteractionReaction> reactions = new List<InteractionReaction>();
 
-    [Header("Quest Logic (Priorit‡ Alta)")]
+    [Header("Quest Logic")]
+    [Tooltip("ID del sotto-obiettivo che deve essere ATTIVO per rendere interagibile questo oggetto.")]
     public string requiredObjective;
-    public string updateObjectiveTo;
+
+    [Tooltip("ID del sotto-obiettivo da marcare come COMPLETATO quando il player interagisce.")]
+    public string completeSubObjectiveID;
+
+    [Tooltip("Evento da sparare al QuestManager (sblocca le Optional in ascolto su questo eventID).")]
+    public string fireEventID;
+
+    [Tooltip("Fatto che deve essere gi√† noto (MemoryManager) prima che questo oggetto sia interagibile. Es: seen_calendario")]
+    public string prerequisiteFactID;
 
     [TextArea(3, 10)]
     public string[] questDialogueLines;
 
+    [Header("UI Anchor")]
+    public Transform promptAnchor;
+
+    [Header("Spawn Oggetto")]
+    [Tooltip("Prefab da istanziare dopo l'interazione. Se vuoto non spawna nulla.")]
+    public GameObject spawnPrefab;
+    [Tooltip("Punto dove viene spawnato il prefab. Se vuoto usa la posizione di questo oggetto.")]
+    public Transform spawnPoint;
 
     private void OnEnable()
     {
-        // [NUOVO] Popolamento automatico della lista se vuota
         if (reactions.Count == 0)
-        {
             reactions.AddRange(GetComponents<InteractionReaction>());
-        }
         StartCoroutine(CheckPersistenceDelayed());
     }
 
-
     private System.Collections.IEnumerator CheckPersistenceDelayed()
     {
-        // Aspetta 1 frame. Questo d‡ tempo al SaveManager di eseguire OnSceneLoaded
-        // e riempire l'inventario PRIMA che l'oggetto controlli se deve sparire.
         yield return null;
-
         CheckPersistence();
     }
 
-    // Controlla se l'oggetto deve esistere o no in base ai salvataggi
     private void CheckPersistence()
     {
-        // Se questo oggetto d‡ un item, ed Ë impostato per distruggersi...
         if (interactableData != null &&
             interactableData.itemToGive != null &&
             interactableData.destroyAfterInteraction)
         {
-            // ...controlliamo se il giocatore ce l'ha gi‡ in tasca.
             if (InventoryManager.Instance != null &&
                 InventoryManager.Instance.HasItem(interactableData.itemToGive.itemID))
-            {
-                // Se ce l'ha, ci disattiviamo subito.
                 SetObjectActive(false);
-            }
         }
     }
 
@@ -73,50 +71,39 @@ public class InteractableObject : MonoBehaviour, IInteractable
     {
         if (interactableData == null) return;
 
+        // Blocca l'interazione se l'oggetto non e' interagibile in questo momento
+        // (es. missione non ancora sbloccata)
+        if (!IsInteractable()) return;
+
         string textToShow = "";
-        // Default: usiamo il ritratto del SO. 
-        // Se volessi cambiarlo dinamicamente, lo faresti qui.
         Sprite portrait = interactableData.characterPortrait;
 
-        // ---------------------------------------------------------
-        // FASE 1: CONTROLLO QUEST (Priorit‡ Massima)
-        // ---------------------------------------------------------
         bool isQuestStepActive = CheckQuestStatus();
 
         if (isQuestStepActive && questDialogueLines.Length > 0)
         {
-            // Siamo in una quest critica: usiamo le linee scritte nell'Inspector
             textToShow = questDialogueLines[questLineIndex];
-
-            // Avanzamento indice
             questLineIndex = (questLineIndex + 1) % questDialogueLines.Length;
 
-            // Aggiorna Obiettivo (Se necessario)
-            if (!string.IsNullOrEmpty(updateObjectiveTo) && ObjectiveManager.Instance != null)
-            {
-                if (ObjectiveManager.Instance.GetCurrentObjective() != updateObjectiveTo)
-                {
-                    ObjectiveManager.Instance.SetObjective(updateObjectiveTo);
-                }
-            }
+            if (!string.IsNullOrEmpty(completeSubObjectiveID) && QuestManager.Instance != null)
+                QuestManager.Instance.CompleteSubObjective(completeSubObjectiveID);
+
+            if (!string.IsNullOrEmpty(fireEventID) && QuestManager.Instance != null)
+                QuestManager.Instance.UnlockSubsByEvent(fireEventID);
         }
-        // ---------------------------------------------------------
-        // FASE 2: CONTROLLO MEMORIA (Priorit‡ Media)
-        // ---------------------------------------------------------
         else
         {
-            // Cerchiamo se c'Ë una variante attiva (es. Ho visto il calendario?)
-            DialogueVariant? activeVariant = GetActiveVariant();
+            if (!string.IsNullOrEmpty(fireEventID) && QuestManager.Instance != null)
+                QuestManager.Instance.UnlockSubsByEvent(fireEventID);
 
+            DialogueVariant? activeVariant = GetActiveVariant();
             if (activeVariant.HasValue)
             {
-                // Trovata variante! Resettiamo indice se Ë cambiata la variante
                 if (lastUsedVariantID != activeVariant.Value.requiredMemoryID)
                 {
                     variantLineIndex = 0;
                     lastUsedVariantID = activeVariant.Value.requiredMemoryID;
                 }
-
                 string[] lines = activeVariant.Value.alternateLines;
                 if (lines.Length > 0)
                 {
@@ -124,9 +111,6 @@ public class InteractableObject : MonoBehaviour, IInteractable
                     variantLineIndex = (variantLineIndex + 1) % lines.Length;
                 }
             }
-            // ---------------------------------------------------------
-            // FASE 3: DEFAULT (Priorit‡ Bassa)
-            // ---------------------------------------------------------
             else
             {
                 if (interactableData.dialogueLines.Length > 0)
@@ -137,110 +121,114 @@ public class InteractableObject : MonoBehaviour, IInteractable
             }
         }
 
-        // ---------------------------------------------------------
-        // FASE 4: OUTPUT & APPRENDIMENTO
-        // ---------------------------------------------------------
-
-        // [NUOVO] ESECUZIONE REAZIONI
-        // Itera su tutte le reazioni configurate ed esegue il metodo React
         foreach (var reaction in reactions)
-        {
             reaction.React(this.gameObject);
-        }
 
-        // Invia alla UI
         if (DialogManager.Instance != null && !string.IsNullOrEmpty(textToShow))
-        {
             DialogManager.Instance.ShowDialog(textToShow, portrait);
-        }
         else
-        {
-            // Fallback se non c'Ë il manager
-            Debug.Log($"[{interactableData.displayName}]: {textToShow}");
-        }
+            Debug.Log("[" + interactableData.displayName + "]: " + textToShow);
 
-        // Raccolta oggetti (se applicabile)
         if (interactableData.itemToGive != null && InventoryManager.Instance != null)
         {
-            // 1. Aggiungi all'inventario
             InventoryManager.Instance.AddItem(interactableData.itemToGive);
-
-            // 2. Feedback (Opzionale: suono o messaggio a schermo)
-            Debug.Log($"Hai raccolto: {interactableData.itemToGive.itemName}");
+            Debug.Log("Hai raccolto: " + interactableData.itemToGive.itemName);
         }
 
-        // Impara il fatto (se questo oggetto insegna qualcosa) [cite: 9]
-        // Lo facciamo alla fine, cosÏ la PRIMA volta che clicchi leggi il default, 
-        // e solo dopo aver letto hai "imparato".
         if (!string.IsNullOrEmpty(interactableData.factToLearn) && MemoryManager.Instance != null)
-        {
             MemoryManager.Instance.SetFact(interactableData.factToLearn);
+
+        // Spawn oggetto (solo se il prefab e' assegnato)
+        if (spawnPrefab != null)
+        {
+            Vector3 pos = spawnPoint != null ? spawnPoint.position : transform.position;
+            Quaternion rot = spawnPoint != null ? spawnPoint.rotation : Quaternion.identity;
+            Instantiate(spawnPrefab, pos, rot);
+            Debug.Log("[Spawn] Istanziato: " + spawnPrefab.name);
         }
 
-        // RIMOZIONE
-        // Se Ë un oggetto da raccogliere (come il Telefono), deve sparire dalla scena
         if (interactableData.destroyAfterInteraction)
-        {
             SetObjectActive(false);
-        }
     }
 
-    // Helper per verificare lo stato della Quest (preso dal tuo script originale)
+    // Chiamato da InteractionPromptUI e PlayerInteraction prima di mostrare il prompt / eseguire l'interazione
+    public virtual bool IsInteractable()
+    {
+        // Prerequisito fatto: se specificato, deve essere gi√† noto prima di qualsiasi altra cosa
+        if (!string.IsNullOrEmpty(prerequisiteFactID))
+        {
+            if (MemoryManager.Instance == null || !MemoryManager.Instance.CheckFact(prerequisiteFactID))
+                return false;
+        }
+
+        bool hasQuestLogic = !string.IsNullOrEmpty(requiredObjective) ||
+                             !string.IsNullOrEmpty(completeSubObjectiveID);
+
+        // Oggetto CON logica quest
+        if (hasQuestLogic)
+        {
+            if (QuestManager.Instance == null) return false;
+
+            string subToCheck = !string.IsNullOrEmpty(requiredObjective)
+                                ? requiredObjective
+                                : completeSubObjectiveID;
+
+            // Sub attiva nello stack ‚Üí prompt visibile
+            if (QuestManager.Instance.IsSubActive(subToCheck))
+                return true;
+
+            // Sub gia' completata ‚Üí prompt solo se ha dialoghi post-completamento
+            if (QuestManager.Instance.IsSubCompleted(subToCheck))
+            {
+                if (interactableData == null) return false;
+                bool hasDefault = interactableData.dialogueLines != null &&
+                                   interactableData.dialogueLines.Length > 0;
+                bool hasVariants = interactableData.memoryVariants != null &&
+                                   interactableData.memoryVariants.Count > 0;
+                return hasDefault || hasVariants;
+            }
+
+            // Missione non ancora sbloccata ‚Üí prompt nascosto
+            return false;
+        }
+
+        // Oggetto SENZA logica quest (puramente narrativo)
+        if (interactableData == null) return false;
+        bool hasDialogue = interactableData.dialogueLines != null &&
+                           interactableData.dialogueLines.Length > 0;
+        bool hasMemory = interactableData.memoryVariants != null &&
+                           interactableData.memoryVariants.Count > 0;
+        return hasDialogue || hasMemory;
+    }
+
     private bool CheckQuestStatus()
     {
-        if (ObjectiveManager.Instance == null) return false;
+        if (string.IsNullOrEmpty(requiredObjective) && string.IsNullOrEmpty(completeSubObjectiveID))
+            return false;
 
-        // --- DEBUG ---
-        string current = ObjectiveManager.Instance.GetCurrentObjective();
-        Debug.Log($"[DEBUG QUEST] Oggetto: {gameObject.name} | Richiesto: '{requiredObjective}' | Attuale: '{current}'");
-
-        // Caso 1: C'Ë un obiettivo richiesto specifico
         if (!string.IsNullOrEmpty(requiredObjective))
         {
-            return string.Equals(
-                ObjectiveManager.Instance.GetCurrentObjective().Trim(),
-                requiredObjective.Trim(),
-                System.StringComparison.OrdinalIgnoreCase
-                );
-        }
-        // Caso 2: » uno start point (nessun requisito ma setta un nuovo obiettivo)
-        else if (!string.IsNullOrEmpty(updateObjectiveTo))
-        {
-            return true;
+            if (QuestManager.Instance == null) return false;
+            bool active = QuestManager.Instance.IsSubActive(requiredObjective);
+            Debug.Log("[Quest Check] " + gameObject.name + " | Richiede: '" + requiredObjective + "' | Attivo: " + active);
+            return active;
         }
 
-        return false;
+        return true;
     }
 
-    // Helper per gestire la disattivazione gerarchica (Padre vs Figlio)
     private void SetObjectActive(bool isActive)
     {
-        // Caso A: Hai assegnato manualmente un padre
-        if (objectToHide != null)
-        {
-            objectToHide.SetActive(false);
-        }
-        // Caso B: Non hai assegnato nulla, spegne se stesso
-        else
-        {
-            gameObject.SetActive(false);
-        }
+        if (objectToHide != null) objectToHide.SetActive(false);
+        else gameObject.SetActive(false);
     }
 
-    // Helper per cercare la variante corretta
     private DialogueVariant? GetActiveVariant()
     {
         if (MemoryManager.Instance == null || interactableData.memoryVariants == null) return null;
-
-        // Cerchiamo nella lista delle varianti se ce n'Ë una soddisfatta
         foreach (var variant in interactableData.memoryVariants)
-        {
             if (MemoryManager.Instance.CheckFact(variant.requiredMemoryID))
-            {
-                return variant; // Ritorna la prima variante valida trovata
-            }
-        }
+                return variant;
         return null;
     }
-
 }

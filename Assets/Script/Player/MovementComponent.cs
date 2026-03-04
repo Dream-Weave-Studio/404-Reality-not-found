@@ -20,15 +20,11 @@ public class MovementComponent : MonoBehaviour
     #region Unity Methods (Start, Update, OnEnable)
     void OnEnable()
     {
-        if (InputManager.Instance == null)
+        if (InputManager.Instance != null)
         {
-            Debug.LogError("InputManager.Instance è null! MovementComponent non può " +
-                          "registrarsi agli eventi.", this);
-            return;
+            InputManager.Instance.OnMove += HandleMoveInput;
+            InputManager.Instance.OnRun += HandleRunToggle;
         }
-
-        InputManager.Instance.OnMove += HandleMoveInput;
-        InputManager.Instance.OnRun += HandleRunToggle;
     }
 
     void OnDisable()
@@ -47,7 +43,6 @@ public class MovementComponent : MonoBehaviour
     public void HandleIsometricMovement()
     {
         float speed = isRunning ? runSpeed : walkSpeed;
-
         Vector3 input = new Vector3(inputDirection.x, 0f, inputDirection.y).normalized;
         Quaternion isoRotation = Quaternion.Euler(0, 45f, 0);
         Vector3 rotatedInput = isoRotation * input;
@@ -57,49 +52,21 @@ public class MovementComponent : MonoBehaviour
         if (rotatedInput != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(rotatedInput);
-            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation,rotationSpeed * Time.deltaTime);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }
     #endregion
 
     #region Utility di Stato Input
 
-    public bool HasMovementInput()
-    {
-        return inputDirection != Vector2.zero;
-    }
-
-    public bool IsRunningInput()
-    {
-        return isRunning;
-    }
+    public bool HasMovementInput() => inputDirection != Vector2.zero;
+    public bool IsRunningInput() => isRunning;
     #endregion
 
     #region Gestione Input
 
-    private void HandleMoveInput(Vector2 input)
-    {
-        // Se il GameManager esiste e NON siamo in fase di Gameplay, annulliamo il movimento.
-        if (GameManager.Instance != null && GameManager.Instance.currentState != GameManager.GameState.Gameplay)
-        {
-            inputDirection = Vector2.zero; // Forza lo stop
-            return;
-        }
-
-        inputDirection = input;
-    }
-
-    private void HandleRunToggle(bool isRunning)
-    {
-        // AGGIUNTA: Stesso controllo per la corsa
-        if (GameManager.Instance != null && GameManager.Instance.currentState != GameManager.GameState.Gameplay)
-        {
-            this.isRunning = false; // Forza la camminata
-            return;
-        }
-
-        this.isRunning = isRunning;
-    }
+    private void HandleMoveInput(Vector2 input) => inputDirection = input;
+    private void HandleRunToggle(bool running) => isRunning = running;
 
     #endregion
 }

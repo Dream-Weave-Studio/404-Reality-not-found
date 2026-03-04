@@ -7,10 +7,14 @@ public class PlayerController : GameEntity
 
     #region Variabili e componenti
 
+    private bool canStandUp = false;
+    public Sprite ryoAngryFace; // Per il dialogo di risposta
+
     private StateMachineController stateMachine;
-    [HideInInspector] public IdleState idleState;
-    [HideInInspector] public WalkingState walkingState;
-    [HideInInspector] public RunningState runningState;
+    public IdleState idleState { get; private set; }
+    public WalkingState walkingState { get; private set; }
+    public RunningState runningState { get; private set; }
+    public SittingState sittingState { get; private set; }
 
     private int blendHash;
 
@@ -37,9 +41,20 @@ public class PlayerController : GameEntity
         idleState = new IdleState(this);
         walkingState = new WalkingState(this);
         runningState = new RunningState(this);
+        sittingState = new SittingState(this);
 
         stateMachine = new StateMachineController();
-        stateMachine.Initialize(idleState);
+
+        // Scegli lo stato iniziale in base alla fase di gioco:
+        // - Se l'intro non è ancora finita, il player parte seduto
+        // - Altrimenti (load di salvataggio) parte in piedi
+        bool startSitting = GameManager.Instance != null && !GameManager.Instance.introFinished;
+
+        // Comunica all'Animator quale stato scegliere
+        if (animator != null)
+            animator.SetBool("SkipIntro", !startSitting);
+
+        stateMachine.Initialize(startSitting ? (IPlayerState)sittingState : idleState);
 
         blendHash = Animator.StringToHash("Blend");
     }
@@ -48,30 +63,70 @@ public class PlayerController : GameEntity
     {
         stateMachine.UpdateState();
 
-        // Aggiorna il parametro float per Blend del BlendTree
         if (animator != null && movementComponent != null)
         {
             float normalized = 0f;
             if (movementComponent.MaxSpeed > 0f)
                 normalized = Mathf.Clamp01(movementComponent.CurrentSpeed / movementComponent.MaxSpeed);
 
-            animator.SetFloat(blendHash, normalized);  // ← Usa hash invece di stringa
+            animator.SetFloat(blendHash, normalized);
         }
+    }
+
+
+
+    #endregion
+
+    #region Gestione Animazione StandUp
+
+    /// <summary>
+    /// Chiamato da SittingState quando il player preme WASD.
+    /// Attiva il trigger sull'Animator e mostra il dialogo.
+    /// </summary>
+    public void TriggerStandUp()
+    {
+        DialogManager.Instance.ShowDialog(
+            "FOTTITI! ASSISTENTE DI MERDA! Ma dove ho lasciato il telefono ieri?",
+            ryoAngryFace
+        );
+
+        if (animator != null)
+            animator.SetTrigger("StandUp");
+    }
+
+    /// <summary>
+    /// Chiamato dall'Animation Event sul frame finale della clip "StandUp".
+    /// Solo qui il movimento viene sbloccato.
+    /// </summary>
+    public void OnStandUpAnimationFinished()
+    {
+        animator.SetBool("SkipIntro", false);
+        TransitionToState(idleState); // ← Ora il player può muoversi
+        GameManager.Instance.EndIntro();
+        QuestManager.Instance.StartQuest(QuestManager.Instance.startingQuest);
+    }
+
+    public void SetBlendTree()
+    {
+        animator.SetTrigger("SetBlendTree");
     }
 
     #endregion
 
-    #region Gestione Stati del Giocatore
+    #region Gestione Stati
 
     public void TransitionToState(IPlayerState newState)
     {
         stateMachine.ChangeState(newState);
     }
+
     #endregion
 
-
+    #region Proxy MovementComponent
 
     public bool HasMovementInput() => movementComponent.HasMovementInput();
     public bool IsRunningInput() => movementComponent.IsRunningInput();
     public void HandleIsometricMovement() => movementComponent.HandleIsometricMovement();
+
+    #endregion
 }

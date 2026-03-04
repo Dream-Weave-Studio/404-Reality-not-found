@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,51 +13,71 @@ public class PlayerInteraction : MonoBehaviour
 
     /// <summary>
     /// Riferimento al collider dell'oggetto attualmente interagibile.
-    /// Se null non c'è nessun oggetto con cui interagire.
+    /// Se null non c'Ã¨ nessun oggetto con cui interagire.
     /// </summary>
     private Collider currentTarget;
 
     // Serve per evitare di chiamare la UI ogni singolo frame
     private bool isPromptActive = false;
+    private bool isSubscribed = false;
+
     #endregion
 
     #region Ciclo di vita Unity (Enable/Disable)
     void OnEnable()
     {
         if (InputManager.Instance != null)
+        {
             InputManager.Instance.OnInteract += HandleInteraction;
+            isSubscribed = true;
+        }
     }
 
     void OnDisable()
     {
         if (InputManager.Instance != null)
             InputManager.Instance.OnInteract -= HandleInteraction;
+        isSubscribed = false;
     }
 
     // AGGIUNTA FONDAMENTALE: Controllo costante dello stato
     void Update()
     {
-        // Se non abbiamo un target, non c'è nulla da fare
+        // Recupera l'iscrizione se OnEnable ï¿½ andato troppo presto
+        if (!isSubscribed && InputManager.Instance != null)
+        {
+            InputManager.Instance.OnInteract += HandleInteraction;
+            isSubscribed = true;
+        }
+        // Se non abbiamo un target, non c'ï¿½ nulla da fare
         if (currentTarget == null) return;
 
         // 1. Controllo Stato: Siamo in Gameplay?
-        bool canInteract = GameManager.Instance.currentState == GameManager.GameState.Gameplay;
+        bool canInteract = GameManager.Instance.currentState == GameManager.GameState.Gameplay
+                        || GameManager.Instance.currentState == GameManager.GameState.WakingUp;
 
         // 2. Gestione UI Dinamica
-        if (canInteract && !isPromptActive)
+        InteractableObject obj = currentTarget.GetComponent<InteractableObject>();
+        bool canShowPrompt = obj != null && obj.IsInteractable();
+
+        if (canInteract && canShowPrompt && !isPromptActive)
         {
-            // Se siamo in gioco, ho un target, ma la UI è spenta -> ACCENDILA
-            // (Succede quando finisce l'intro e sei già sopra la sveglia)
-            InteractableObject objScript = currentTarget.GetComponent<InteractableObject>();
-            if (objScript != null && InteractionPromptUI.Instance != null)
+            // Oggetto interagibile e prompt non ancora mostrato -> MOSTRALO
+            if (InteractionPromptUI.Instance != null)
             {
-                InteractionPromptUI.Instance.ShowPrompt(objScript);
+                InteractionPromptUI.Instance.ShowPrompt(obj);
                 isPromptActive = true;
             }
         }
+        else if (canInteract && !canShowPrompt && isPromptActive)
+        {
+            // Oggetto non piu interagibile (missione cambiata) -> NASCONDILO
+            InteractionPromptUI.Instance?.HidePrompt();
+            isPromptActive = false;
+        }
         else if (!canInteract && isPromptActive)
         {
-            // Se NON siamo in gioco (es. parte una cutscene), ma la UI è accesa -> SPEGNILA
+            // Se NON siamo in gioco (es. parte una cutscene), ma la UI ï¿½ accesa -> SPEGNILA
             if (InteractionPromptUI.Instance != null)
             {
                 InteractionPromptUI.Instance.HidePrompt();
@@ -97,19 +117,32 @@ public class PlayerInteraction : MonoBehaviour
 
     /// <summary>
     /// Viene chiamato quando il giocatore preme il tasto di interazione.
-    /// Se è presente un oggetto attivo che implementa IInteractable, attiva la sua logica.
+    /// Se ï¿½ presente un oggetto attivo che implementa IInteractable, attiva la sua logica.
     /// </summary>
 
     void HandleInteraction()
     {
-        // AGGIUNTA: Blocca interazione se non è Gameplay
-        if (GameManager.Instance != null && GameManager.Instance.currentState != GameManager.GameState.Gameplay)
+        // Blocca se c'ï¿½ un dialogo in corso
+        if (DialogManager.Instance != null && DialogManager.Instance.IsDialogActive)
             return;
+
+        // Blocca interazione se non ï¿½ Gameplay
+        if (GameManager.Instance != null)
+        {
+            var state = GameManager.Instance.currentState;
+            bool allowed = state == GameManager.GameState.Gameplay
+                        || state == GameManager.GameState.WakingUp;
+            if (!allowed) return;
+        }
 
         if (currentTarget == null)
             return;
 
-        // Interazione generica — può diventare un sistema ad eventi
+        // Interazione generica ï¿½ puï¿½ diventare un sistema ad eventi
+        // Blocca se l oggetto non e interagibile in questo momento
+        InteractableObject objCheck = currentTarget.GetComponent<InteractableObject>();
+        if (objCheck != null && !objCheck.IsInteractable()) return;
+
         IInteractable interactable = currentTarget.GetComponent<IInteractable>();
         if (interactable != null)
         {

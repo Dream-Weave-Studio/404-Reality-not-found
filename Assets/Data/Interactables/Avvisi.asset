@@ -10,20 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9cbfae28123821e45a1f194e41db6486, type: 3}
-  m_Name: Bolletta
+  m_Name: Avvisi
   m_EditorClassIdentifier: 
-  id: bolletta
-  displayName: Bolletta
-  characterPortrait: {fileID: 21300000, guid: 7003ad22f9a14c647bb3c99a31defd47, type: 3}
+  id: avvisi
+  displayName: Avvisi
+  characterPortrait: {fileID: 21300000, guid: cf7e2cba3fd3843408bf914fe0c79757, type: 3}
+  interlocutorPortrait: {fileID: 0}
   dialogueLines:
-  - Devo pagare la TARI
-  - Avessi almeno un buon servizio...
+  - "Devo ancora pagare questi avvisi di mancato pagamento, come al solito il boss
+    paga in ritardo per\xF2 non sia mai che i nostri report facciano lo stesso!"
   memoryVariants:
   - requiredMemoryID: calendario
     alternateLines:
     - 'E devo pagarla... '
     - 'E devo pagarla... '
-  factToLearn: 
+  factToLearn: seen_avvisi
   itemToGive: {fileID: 0}
   destroyAfterInteraction: 0
   requiredItem: {fileID: 0}

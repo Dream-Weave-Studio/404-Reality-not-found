@@ -1,83 +1,82 @@
-using UnityEngine;
+ï»¿using UnityEngine;
+using System.Collections;
 using static GameManager;
 
 public class SmartSpeaker : InteractableObject
 {
     [Header("Impostazioni Sveglia")]
-    public int interactionCount = 0; // Conta i tentativi
-    public AudioSource alarmAudio;   // Il 'bip bip'
-    public AudioSource stopAudio;    // Il suono di conferma
+    public int interactionCount = 0;
+    public AudioSource alarmAudio;
+    public AudioSource stopAudio;
 
     [Header("Asset Dialogo UI")]
-    // Ci servono le facce di Ryo per la UI
-    public Sprite ryoSleepyFace; // Per i primi tentativi
-    public Sprite ryoAngryFace;  // Per l'urlo finale
-    public string speakerName = "Ryo"; // Chi sta parlando
+    public Sprite ryoSleepyFace;
+    public Sprite ryoAngryFace;
+    public string speakerName = "Ryo";
 
     private void Update()
     {
-        // Se siamo in Intro, Lexa non deve essere "interagibile"
-        if (GameManager.Instance.currentState == GameState.IntroSequence)
-        {
-            GetComponent<Collider>().enabled = false; // Disabilita fisicamente il trigger
-        }
-        else
-        {
-            GetComponent<Collider>().enabled = true; // Riabilita quando inizia il Gameplay
-        }
+        bool active = GameManager.Instance.currentState == GameState.WakingUp
+                   || GameManager.Instance.currentState == GameState.Gameplay;
+
+        GetComponent<Collider>().enabled = active;
     }
 
-    // OVERRIDE: Sostituiamo la logica standard con quella della sveglia
+    // Override: la sveglia bypassa la logica quest di IsInteractable()
+    // ed Ã¨ interagibile in base allo stato di gioco, non alle missioni
+    public override bool IsInteractable()
+    {
+        return GameManager.Instance.currentState == GameState.WakingUp
+            || GameManager.Instance.currentState == GameState.Gameplay;
+    }
+
     public override void Interact()
     {
-        // 1. CONTROLLO OBIETTIVO
-        // Se NON è mattina (obiettivo diverso da "SVEGLIA_MATTINA"), comportati come un oggetto normale.
-        // 'base.Interact()' chiama il codice dello script genitore (dialoghi, item, ecc.)
-        if (ObjectiveManager.Instance == null || ObjectiveManager.Instance.GetCurrentObjective() != "SVEGLIA_MATTINA")
+        // Sequenza sveglia: attiva durante WakingUp
+        if (GameManager.Instance.currentState == GameState.WakingUp)
         {
-            base.Interact();
+            if (interactionCount >= 3) return;
+
+            interactionCount++;
+
+            if (interactionCount == 1)
+                DialogManager.Instance.ShowDialog("Lexa stop!", ryoSleepyFace);
+            else if (interactionCount == 2)
+                DialogManager.Instance.ShowDialog("Lexa stoop!", ryoSleepyFace);
+            else if (interactionCount == 3)
+                StopAlarmSequence();
+
             return;
         }
 
-        // 2. LOGICA SPECIALE (Siamo nella fase sveglia)
-        interactionCount++;
-
-        if (interactionCount == 1)
-        {
-            // Primo tentativo
-            Debug.Log("Ryo: Lexa stop!");
-            DialogManager.Instance.ShowDialog("Lexa stop!", ryoSleepyFace);
-        }
-        else if (interactionCount == 2)
-        {
-            // Secondo tentativo
-            Debug.Log("Ryo: Lexa stoop!");
-            DialogManager.Instance.ShowDialog("Lexa stoop!", ryoSleepyFace);
-        }
-        else if (interactionCount >= 3)
-        {
-            // TERZO TENTATIVO: SUCCESSO
-            StopAlarmSequence();
-        }
+        // Qualsiasi altro momento â†’ comportamento standard di InteractableObject
+        base.Interact();
     }
 
     private void StopAlarmSequence()
     {
-        // Ferma il suono fastidioso e suona conferma
         if (alarmAudio) alarmAudio.Stop();
         if (stopAudio) stopAudio.Play();
 
-        Debug.Log("Ryo: argh!! Lexa ho detto stooop!!");
         DialogManager.Instance.ShowDialog("Argh!! Lexa ho detto stooop!!", ryoAngryFace);
 
-        // CAMBIO STATO: Aggiorna l'obiettivo nel Manager
-        // Questo farà scattare la UI: "OBIETTIVO: TROVA IL TELEFONO"
-        if (ObjectiveManager.Instance != null)
-        {
-            ObjectiveManager.Instance.SetObjective("TROVA IL TELEFONO");
-        }
+        if (InteractionPromptUI.Instance != null)
+            InteractionPromptUI.Instance.HidePrompt();
 
-        // OPZIONALE: Resettiamo il contatore o disabilitiamo l'interazione speciale
-        // Da ora in poi, l'if iniziale fallirà e l'oggetto diventerà "normale"
+        StartCoroutine(WaitDialogThenFade());
+    }
+
+    private IEnumerator WaitDialogThenFade()
+    {
+        yield return new WaitForSeconds(2.0f);
+
+        IntroController.Instance.FinishIntro();
+
+        yield return new WaitForSeconds(1.0f);
+
+        DialogManager.Instance.ShowDialogPersistent(
+            "Buongiorno Ryo, non dimenticarti di fare del buon movimento con W A S D o con l'Analogico sinistro del Controller",
+            interactableData.interlocutorPortrait
+        );
     }
 }
