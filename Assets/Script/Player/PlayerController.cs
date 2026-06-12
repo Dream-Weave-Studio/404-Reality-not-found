@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerController : GameEntity
 {
     [SerializeField] private MovementComponent movementComponent;
+    [SerializeField] private LoadingText loadingText;
 
     #region Variabili e componenti
 
@@ -102,6 +103,7 @@ public class PlayerController : GameEntity
     {
         animator.SetBool("SkipIntro", false);
         TransitionToState(idleState); // ← Ora il player può muoversi
+        loadingText.StopLoading();
         GameManager.Instance.EndIntro();
         QuestManager.Instance.StartQuest(QuestManager.Instance.startingQuest);
     }

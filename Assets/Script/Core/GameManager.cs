@@ -5,6 +5,9 @@ public class GameManager : MonoBehaviour
 {
     public static GameManager Instance;
 
+    //[SerializeField] private LoadingText loadingText;
+    //private bool WakeUp = false;
+
     // Definiamo gli stati del gioco possibili nella Scena 1
     public enum GameState
     {
@@ -62,6 +65,7 @@ public class GameManager : MonoBehaviour
                 // leggendo lo stato nel suo Start()
                 break;
             case GameState.Gameplay:
+                
                 // Sblocca input giocatore
                 Time.timeScale = 1;
                 break;
@@ -97,7 +101,7 @@ public class GameManager : MonoBehaviour
         }
     }
     public void OnWakeUpAnimationFinished()
-    {
+    {     
         ChangeState(GameState.Gameplay);
     }
 }

@@ -4,8 +4,7 @@ public class SittingState : IPlayerState
 {
     private readonly PlayerController player;
     private bool standUpTriggered = false;
-
-   
+ 
 
     public SittingState(PlayerController player)
     {
