@@ -30,3 +30,9 @@ MonoBehaviour:
   - id: spegni_tv
     displayName: SPEGNI LA TV
     unlockedByEventID: placed_keys
+  - id: prendi_telefono
+    displayName: TROVA IL TELEFONO
+    unlockedByEventID: turned_off_tv
+  - id: siediti_pc
+    displayName: SIEDITI AL PC
+    unlockedByEventID: found_phone

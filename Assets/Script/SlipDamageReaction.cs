@@ -19,7 +19,8 @@ public class SlipDamageReaction : InteractionReaction
 
         hasActivated = true;
 
-        GameEntity entity = interactor.GetComponent<GameEntity>();
+        GameObject player = GameObject.FindWithTag("Player");
+        GameEntity entity = player != null ? player.GetComponent<GameEntity>() : null;
         if (entity != null)
         {
             // Applica effetti

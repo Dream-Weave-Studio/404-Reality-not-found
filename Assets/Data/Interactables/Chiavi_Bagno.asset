@@ -17,7 +17,9 @@ MonoBehaviour:
   characterPortrait: {fileID: 21300000, guid: cf7e2cba3fd3843408bf914fe0c79757, type: 3}
   interlocutorPortrait: {fileID: 0}
   dialogueLines:
-  - 
+  - Le chiavi qui...? Ieri dovevo stare proprio messo male.
+  - Le ho mollate qui per prendere le pillole.
+  - Nemmeno le ho sistemate.
   memoryVariants: []
   factToLearn: found_keys_fact
   itemToGive: {fileID: 0}

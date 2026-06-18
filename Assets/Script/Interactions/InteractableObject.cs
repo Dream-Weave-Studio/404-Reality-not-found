@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class InteractableObject : MonoBehaviour, IInteractable
@@ -133,6 +133,16 @@ public class InteractableObject : MonoBehaviour, IInteractable
         {
             InventoryManager.Instance.AddItem(interactableData.itemToGive);
             Debug.Log("Hai raccolto: " + interactableData.itemToGive.itemName);
+
+            if (interactableData.itemToGive.itemID == "medikit")
+            {
+                GameObject player = GameObject.FindWithTag("Player");
+                if (player != null && player.TryGetComponent(out GameEntity entity))
+                {
+                    entity.Heal(100f);
+                    Debug.Log("[InteractableObject] Player healed by Medikit pickup.");
+                }
+            }
         }
 
         if (!string.IsNullOrEmpty(interactableData.factToLearn) && MemoryManager.Instance != null)

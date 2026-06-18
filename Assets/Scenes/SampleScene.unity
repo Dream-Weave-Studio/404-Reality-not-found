@@ -4146,7 +4146,7 @@ MonoBehaviour:
   interactableData: {fileID: 11400000, guid: 600c4f898eb813d49aeb2213220edca7, type: 2}
   objectToHide: {fileID: 0}
   reactions: []
-  requiredObjective: PRENDI IL MEDIKIT
+  requiredObjective: prendi_medikit
   completeSubObjectiveID: prendi_medikit
   fireEventID: 
   prerequisiteFactID: 
@@ -6444,8 +6444,8 @@ MonoBehaviour:
   interactableData: {fileID: 11400000, guid: faa6ee156c095424e88d038badc4216d, type: 2}
   objectToHide: {fileID: 0}
   reactions: []
-  requiredObjective: SIEDITI AL PC
-  completeSubObjectiveID: 
+  requiredObjective: siediti_pc
+  completeSubObjectiveID: siediti_pc
   fireEventID: 
   prerequisiteFactID: 
   questDialogueLines:
@@ -8191,7 +8191,7 @@ MonoBehaviour:
   reactions: []
   requiredObjective: spegni_tv
   completeSubObjectiveID: spegni_tv
-  fireEventID: 
+  fireEventID: turned_off_tv
   prerequisiteFactID: 
   questDialogueLines:
   - "ieri devo aver dimenticato la tv accesa\u2026 o \xE8 stata quel maledetto assistente
@@ -13341,12 +13341,13 @@ MonoBehaviour:
   interactableData: {fileID: 11400000, guid: 016d3ca5612fcf94da0d5c9849567428, type: 2}
   objectToHide: {fileID: 0}
   reactions: []
-  requiredObjective: TROVA IL TELEFONO
-  completeSubObjectiveID: 
-  fireEventID: 
+  requiredObjective: prendi_telefono
+  completeSubObjectiveID: prendi_telefono
+  fireEventID: found_phone
   prerequisiteFactID: 
   questDialogueLines:
   - Eccolo...
+  - "oh cazzo! Ma \xE8 tardissimo, devo lavorare!"
   promptAnchor: {fileID: 0}
   spawnPrefab: {fileID: 0}
   spawnPoint: {fileID: 0}
@@ -13384,6 +13385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   targetQuestID: trova_telefono
+  targetSubObjectiveID: spegni_tv
   spawnVFX: {fileID: 0}
 --- !u!114 &1748264391
 MonoBehaviour:
