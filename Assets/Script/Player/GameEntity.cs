@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class GameEntity : MonoBehaviour
@@ -9,7 +10,20 @@ public class GameEntity : MonoBehaviour
     // Riferimento centralizzato all'Animator
     protected Animator animator;
 
-    protected virtual void Start()
+    // Evento per notificare la UI
+    public event Action<float, float> OnHealthChanged;
+
+    public float GetMaxHealth()
+    {
+        return maxHealth;
+    }
+
+    public float GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+
+    protected virtual void Awake()
     {
         currentHealth = maxHealth;
 
@@ -17,10 +31,17 @@ public class GameEntity : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
+    protected virtual void Start()
+    {
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
     public virtual void TakeDamage(float damageAmount)
     {
         currentHealth -= damageAmount;
         LogDamage(currentHealth);
+
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
 
         if (currentHealth <= 0)
         {
@@ -38,6 +59,8 @@ public class GameEntity : MonoBehaviour
     {
         currentHealth += amount;
         currentHealth = Mathf.Clamp(currentHealth, 0f, maxHealth);
+
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
     // Debug Helpers - Compilati solo in Editor
@@ -50,6 +73,6 @@ public class GameEntity : MonoBehaviour
     [System.Diagnostics.Conditional("UNITY_EDITOR")]
     private void LogDeath()
     {
-        Debug.Log($"{gameObject.name} è morto/a.", this);
+        Debug.Log($"{gameObject.name} Ã¨ morto/a.", this);
     }
 }
