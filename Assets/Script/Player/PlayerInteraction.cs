@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -136,7 +136,21 @@ public class PlayerInteraction : MonoBehaviour
         }
 
         if (currentTarget == null)
+        {
+            // FALLBACK PER LA SVEGLIA: Se siamo nello stato WakingUp ed il target è nullo,
+            // cerchiamo lo SmartSpeaker nella scena per interagire direttamente.
+            if (GameManager.Instance != null && GameManager.Instance.currentState == GameManager.GameState.WakingUp)
+            {
+                SmartSpeaker speaker = FindObjectOfType<SmartSpeaker>();
+                if (speaker != null && speaker.IsInteractable())
+                {
+                    speaker.Interact();
+                    Debug.Log("Interazione di fallback con: " + speaker.name);
+                    return;
+                }
+            }
             return;
+        }
 
         // Interazione generica � pu� diventare un sistema ad eventi
         // Blocca se l oggetto non e interagibile in questo momento
