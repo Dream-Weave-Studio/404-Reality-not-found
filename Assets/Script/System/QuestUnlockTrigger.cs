@@ -7,10 +7,21 @@ public class QuestUnlockTrigger : MonoBehaviour
     public GameObject spawnVFX;
     void Start() 
     { 
-        gameObject.SetActive(false); 
         if (QuestManager.Instance != null && !string.IsNullOrEmpty(targetSubObjectiveID))
         {
-            QuestManager.Instance.OnSubObjectiveCompleted.AddListener(OnSubObjectiveCompleted);
+            if (QuestManager.Instance.IsSubCompleted(targetSubObjectiveID))
+            {
+                gameObject.SetActive(true);
+            }
+            else
+            {
+                gameObject.SetActive(false);
+                QuestManager.Instance.OnSubObjectiveCompleted.AddListener(OnSubObjectiveCompleted);
+            }
+        }
+        else
+        {
+            gameObject.SetActive(false);
         }
     }
     public void OnQuestCompleted(SO_Quest completedQuest)
