@@ -1,9 +1,5 @@
 using UnityEngine;
 
-/// <summary>
-/// Reazione che applica danno e rabbia UNA SOLA VOLTA.
-/// Da usare insieme a InteractableObject o come trigger.
-/// </summary>
 public class SlipDamageReaction : InteractionReaction
 {
     [Header("Parametri")]
@@ -20,12 +16,12 @@ public class SlipDamageReaction : InteractionReaction
         hasActivated = true;
 
         GameObject player = GameObject.FindWithTag("Player");
-        GameEntity entity = player != null ? player.GetComponent<GameEntity>() : null;
-        if (entity != null)
+        PlayerController playerController = player != null ? player.GetComponent<PlayerController>() : null;
+        if (playerController != null)
         {
-            // Applica effetti
-            entity.TakeDamage(damageAmount);
-            // if (giveRage) entity.ModifyRage(rageAmount);
+            playerController.TakeDamage(damageAmount);
+
+            playerController.SlipAndFall();
 
             Debug.Log($"[SlipDamage] Scivolata! Danno: {damageAmount}, Rabbia: {(giveRage ? rageAmount : 0)}");
         }

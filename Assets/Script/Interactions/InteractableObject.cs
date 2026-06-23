@@ -44,6 +44,7 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
     private void OnEnable()
     {
+        reactions.RemoveAll(r => r == null);
         if (reactions.Count == 0)
             reactions.AddRange(GetComponents<InteractionReaction>());
         StartCoroutine(CheckPersistenceDelayed());
@@ -80,7 +81,16 @@ public class InteractableObject : MonoBehaviour, IInteractable
 
         bool isQuestStepActive = CheckQuestStatus();
 
-        if (isQuestStepActive && questDialogueLines.Length > 0)
+        bool useQuestDialogue = isQuestStepActive;
+        if (!useQuestDialogue && questDialogueLines.Length > 0 && !string.IsNullOrEmpty(interactableData.factToLearn))
+        {
+            if (MemoryManager.Instance != null && !MemoryManager.Instance.CheckFact(interactableData.factToLearn))
+            {
+                useQuestDialogue = true;
+            }
+        }
+
+        if (useQuestDialogue && questDialogueLines.Length > 0)
         {
             textToShow = questDialogueLines[questLineIndex];
             questLineIndex = (questLineIndex + 1) % questDialogueLines.Length;
@@ -122,7 +132,10 @@ public class InteractableObject : MonoBehaviour, IInteractable
         }
 
         foreach (var reaction in reactions)
-            reaction.React(this.gameObject);
+        {
+            if (reaction != null)
+                reaction.React(this.gameObject);
+        }
 
         if (DialogManager.Instance != null && !string.IsNullOrEmpty(textToShow))
             DialogManager.Instance.ShowDialog(textToShow, portrait);

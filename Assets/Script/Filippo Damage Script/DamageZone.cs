@@ -21,6 +21,11 @@ public class DamageZone : MonoBehaviour
             hasActivated = true;
             entity.TakeDamage(damageAmount);
 
+            if (entity is PlayerController player)
+            {
+                player.SlipAndFall();
+            }
+
             if (QuestManager.Instance != null && !string.IsNullOrEmpty(eventToFire))
             {
                 QuestManager.Instance.UnlockSubsByEvent(eventToFire);

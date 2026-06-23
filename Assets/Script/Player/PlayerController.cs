@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : GameEntity
@@ -16,6 +16,7 @@ public class PlayerController : GameEntity
     public WalkingState walkingState { get; private set; }
     public RunningState runningState { get; private set; }
     public SittingState sittingState { get; private set; }
+    public SlippedState slippedState { get; private set; }
 
     private int blendHash;
 
@@ -43,6 +44,7 @@ public class PlayerController : GameEntity
         walkingState = new WalkingState(this);
         runningState = new RunningState(this);
         sittingState = new SittingState(this);
+        slippedState = new SlippedState(this);
 
         stateMachine = new StateMachineController();
 
@@ -102,10 +104,22 @@ public class PlayerController : GameEntity
     public void OnStandUpAnimationFinished()
     {
         animator.SetBool("SkipIntro", false);
+
+        if (stateMachine.GetCurrentStateName() == "SlippedState")
+        {
+            TransitionToState(idleState);
+            return;
+        }
+
         TransitionToState(idleState); // ← Ora il player può muoversi
         loadingText.StopLoading();
         GameManager.Instance.EndIntro();
         QuestManager.Instance.StartQuest(QuestManager.Instance.startingQuest);
+    }
+
+    public void SlipAndFall()
+    {
+        TransitionToState(slippedState);
     }
 
     public void SetBlendTree()
