@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class CameraObstructionFader : MonoBehaviour
 {
@@ -13,8 +14,10 @@ public class CameraObstructionFader : MonoBehaviour
     public float heightOffset = 1.5f;
 
     [Header("Visual Style (Live Edit)")]
-    public float holeRadius = 1.5f;   // Controlla la grandezza del buco
-    public float pixelDensity = 30f;  // Controlla la grossezza dei pixel
+    public float holeRadius = 1.5f;  
+    public float pixelDensity = 30f; 
+
+    private Dictionary<Collider, WallFader> faderCache = new Dictionary<Collider, WallFader>();
 
     // Debug Visivo
     private Vector3 debugRayStart;
@@ -35,14 +38,18 @@ public class CameraObstructionFader : MonoBehaviour
 
         foreach (RaycastHit hit in hits)
         {
-            WallFader fader = hit.collider.GetComponent<WallFader>();
-            if (fader == null) fader = hit.collider.GetComponentInParent<WallFader>();
+            if (!faderCache.TryGetValue(hit.collider, out WallFader fader))
+            {
+                fader = hit.collider.GetComponent<WallFader>();
+                if (fader == null) fader = hit.collider.GetComponentInParent<WallFader>();
+                faderCache[hit.collider] = fader; 
+            }
 
             if (fader == null)
             {
                 Debug.LogWarning($"[CameraObstructionFader] {hit.collider.name} " +
-                                 "� sul wallLayer ma non ha WallFader. Aggiungilo in Editor.");
-                continue; // Salta, non creare nulla
+                                 "è sul wallLayer ma non ha WallFader. Aggiungilo in Editor.");
+                continue; 
             }
 
             fader.StayOpen(targetPos, fadeSpeed, closeSpeed, holeRadius, pixelDensity);
