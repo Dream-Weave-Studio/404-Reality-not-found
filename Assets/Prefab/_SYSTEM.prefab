@@ -12,11 +12,11 @@ GameObject:
   - component: {fileID: 8895032803985873672}
   - component: {fileID: 5435390221412303423}
   - component: {fileID: 3847986674006558913}
-  - component: {fileID: 3232399755567779245}
   - component: {fileID: 2419382692288173134}
   - component: {fileID: 1146801473768830376}
   - component: {fileID: 6898441786002745690}
   - component: {fileID: 3014145859313894499}
+  - component: {fileID: 8998677561085704698}
   m_Layer: 0
   m_Name: _SYSTEM
   m_TagString: Untagged
@@ -71,6 +71,7 @@ MonoBehaviour:
   dialogText: {fileID: 0}
   typingSpeed: 0.03
   displayDuration: 3
+  readingSpeedPerWord: 0.4
 --- !u!114 &3847986674006558913
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -105,21 +106,6 @@ MonoBehaviour:
     momento di cercarla..."
   typingSpeed: 0.0003
   fadeOutDuration: 2
---- !u!114 &3232399755567779245
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 506989438053319321}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b1994a35b5c87874c9837b8570dd51ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  objectivePanel: {fileID: 0}
-  objectiveText: {fileID: 0}
-  fadeDuration: 1
 --- !u!114 &2419382692288173134
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -162,6 +148,8 @@ MonoBehaviour:
   objectNameText: {fileID: 0}
   panelRect: {fileID: 0}
   offset: {x: 0, y: 2, z: 0}
+  rootCanvas: {fileID: 0}
+  player: {fileID: 0}
 --- !u!114 &3014145859313894499
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,3 +164,36 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventory: []
   allItemsDatabase: []
+--- !u!114 &8998677561085704698
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506989438053319321}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed6e1d5ce37bcbe459ded5e13da222c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startingQuest: {fileID: 11400000, guid: 1078c5ea6a10eb84da140a8973206db0, type: 2}
+  autoStartOnAwake: 1
+  allQuests: []
+  OnSubObjectiveCompleted:
+    m_PersistentCalls:
+      m_Calls: []
+  OnAllRequiredCompleted:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: 
+        m_MethodName: 
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2

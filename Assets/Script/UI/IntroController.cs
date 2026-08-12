@@ -121,8 +121,30 @@ public class IntroController : MonoBehaviour
         }
         else
         {
-            FinishIntro();
+            StartCoroutine(WaitAfterLetter());
         }
+    }
+    private IEnumerator WaitAfterLetter()
+    {
+        // La lettera scompare dallo schermo
+        letterText.text = "";
+
+        // 1. SILENZIO E BUIO
+        yield return new WaitForSeconds(3.0f);
+
+        // 2. LA SVEGLIA INIZIA A SUONARE 
+                    // Cerca lo SmartSpeaker nella scena e avvia l'audio
+        SmartSpeaker speaker = FindObjectOfType<SmartSpeaker>();
+        if (speaker != null && speaker.alarmAudio != null)
+        {
+            speaker.alarmAudio.Play();
+        }
+
+        // 3. PAUSA DI RIFLESSIONE: Il giocatore sente il suono ma non ha ancora il controllo
+        yield return new WaitForSeconds(2.5f);
+
+        // Cambiamo lo stato per permettere l'interazione
+        GameManager.Instance.ChangeState(GameManager.GameState.WakingUp);
     }
 
     private IEnumerator TypeLine(string line)
@@ -139,7 +161,7 @@ public class IntroController : MonoBehaviour
         isTyping = false;
     }
 
-    private void FinishIntro()
+    public void FinishIntro()
     {
         introFinished = true;
         StartCoroutine(FadeOutSequence());

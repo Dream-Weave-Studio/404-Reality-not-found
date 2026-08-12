@@ -1,83 +1,174 @@
-using UnityEngine;
+ï»¿using UnityEngine;
+using System.Collections;
 using static GameManager;
 
 public class SmartSpeaker : InteractableObject
 {
     [Header("Impostazioni Sveglia")]
-    public int interactionCount = 0; // Conta i tentativi
-    public AudioSource alarmAudio;   // Il 'bip bip'
-    public AudioSource stopAudio;    // Il suono di conferma
+    public int interactionCount = 0;
+
+    [Tooltip("Se vuoi mantenere l'AudioSource locale (posizionale), assegnalo qui. Altrimenti lascia null e usa alarmClipId.")]
+    public AudioSource alarmAudio;        // opzionale, legacy/local
+    [Tooltip("AudioSource per il suono di stop (legacy).")]
+    public AudioSource stopAudio;         // opzionale, legacy
+
+    [Tooltip("Se usi AudioManager, inserisci qui l'id del clip per la sveglia (es. 'sveglia_loop').")]
+    public string alarmClipId = "";
+
+    [Tooltip("Se usi AudioManager, inserisci qui l'id del clip per il suono di stop (es. 'sveglia_stop').")]
+    public string stopClipId = "";
 
     [Header("Asset Dialogo UI")]
-    // Ci servono le facce di Ryo per la UI
-    public Sprite ryoSleepyFace; // Per i primi tentativi
-    public Sprite ryoAngryFace;  // Per l'urlo finale
-    public string speakerName = "Ryo"; // Chi sta parlando
+    public Sprite ryoSleepyFace;
+    public Sprite ryoAngryFace;
+    public string speakerName = "Ryo";
 
-    private void Update()
+    // riferimento all'AudioSource creato/gestito dall'AudioManager (se usato)
+    private AudioSource alarmManagedSource;
+
+    private void Awake()
     {
-        // Se siamo in Intro, Lexa non deve essere "interagibile"
-        if (GameManager.Instance.currentState == GameState.IntroSequence)
+        // sicurezza: non far partire nulla in PlayOnAwake
+        if (alarmAudio != null)
         {
-            GetComponent<Collider>().enabled = false; // Disabilita fisicamente il trigger
+            alarmAudio.playOnAwake = false;
+            // assicurati che l'output sia il gruppo SFX (opzionale)
+            if (AudioManager.Instance != null && AudioManager.Instance.sfxGroup != null)
+                alarmAudio.outputAudioMixerGroup = AudioManager.Instance.sfxGroup;
         }
-        else
+        if (stopAudio != null)
         {
-            GetComponent<Collider>().enabled = true; // Riabilita quando inizia il Gameplay
+            stopAudio.playOnAwake = false;
+            if (AudioManager.Instance != null && AudioManager.Instance.sfxGroup != null)
+                stopAudio.outputAudioMixerGroup = AudioManager.Instance.sfxGroup;
         }
     }
 
-    // OVERRIDE: Sostituiamo la logica standard con quella della sveglia
+    private void Update()
+    {
+        bool active = GameManager.Instance.currentState == GameState.WakingUp
+                   || GameManager.Instance.currentState == GameState.Gameplay;
+
+        var col = GetComponent<Collider>();
+        if (col != null) col.enabled = active;
+    }
+
+    public override bool IsInteractable()
+    {
+        return GameManager.Instance.currentState == GameState.WakingUp
+            || GameManager.Instance.currentState == GameState.Gameplay;
+    }
+
     public override void Interact()
     {
-        // 1. CONTROLLO OBIETTIVO
-        // Se NON è mattina (obiettivo diverso da "SVEGLIA_MATTINA"), comportati come un oggetto normale.
-        // 'base.Interact()' chiama il codice dello script genitore (dialoghi, item, ecc.)
-        if (ObjectiveManager.Instance == null || ObjectiveManager.Instance.GetCurrentObjective() != "SVEGLIA_MATTINA")
+        // Sequenza sveglia: attiva durante WakingUp
+        if (GameManager.Instance.currentState == GameState.WakingUp)
         {
-            base.Interact();
+            if (interactionCount >= 3) return;
+
+            interactionCount++;
+
+            if (interactionCount == 1)
+                DialogManager.Instance.ShowDialog("Lexa stop!", ryoSleepyFace);
+            else if (interactionCount == 2)
+                DialogManager.Instance.ShowDialog("Lexa stoop!", ryoSleepyFace);
+            else if (interactionCount == 3)
+                StopAlarmSequence();
+
             return;
         }
 
-        // 2. LOGICA SPECIALE (Siamo nella fase sveglia)
-        interactionCount++;
+        // Qualsiasi altro momento â†’ comportamento standard di InteractableObject
+        base.Interact();
+    }
 
-        if (interactionCount == 1)
+    // Chiamare questo per avviare la sveglia (es. da GameManager quando entra in WakingUp)
+    public void StartAlarmSequence(float volume = 1f, float spatialBlend = 1f)
+    {
+        // Se esiste AudioSource locale, usalo (posizionale)
+        if (alarmAudio != null)
         {
-            // Primo tentativo
-            Debug.Log("Ryo: Lexa stop!");
-            DialogManager.Instance.ShowDialog("Lexa stop!", ryoSleepyFace);
+            alarmAudio.loop = true;
+            alarmAudio.volume = volume;
+            alarmAudio.spatialBlend = spatialBlend;
+            alarmAudio.Play();
+            return;
         }
-        else if (interactionCount == 2)
+
+        // Altrimenti prova con AudioManager usando alarmClipId
+        if (!string.IsNullOrEmpty(alarmClipId) && AudioManager.Instance != null)
         {
-            // Secondo tentativo
-            Debug.Log("Ryo: Lexa stoop!");
-            DialogManager.Instance.ShowDialog("Lexa stoop!", ryoSleepyFace);
+            if (AudioManager.Instance.HasClip(alarmClipId))
+            {
+                // PlaySFXOnObject ritorna l'AudioSource usato sul GameObject target
+                alarmManagedSource = AudioManager.Instance.PlaySFXOnObject(alarmClipId, gameObject, true, volume, spatialBlend);
+            }
+            else
+            {
+                Debug.LogWarning($"SmartSpeaker: alarmClipId '{alarmClipId}' non trovato in AudioManager");
+            }
+            return;
         }
-        else if (interactionCount >= 3)
-        {
-            // TERZO TENTATIVO: SUCCESSO
-            StopAlarmSequence();
-        }
+
+        // Fallback: log se nessuna sorgente disponibile
+        Debug.LogWarning("SmartSpeaker: nessun AudioSource locale o alarmClipId impostato per StartAlarmSequence");
     }
 
     private void StopAlarmSequence()
     {
-        // Ferma il suono fastidioso e suona conferma
-        if (alarmAudio) alarmAudio.Stop();
-        if (stopAudio) stopAudio.Play();
-
-        Debug.Log("Ryo: argh!! Lexa ho detto stooop!!");
-        DialogManager.Instance.ShowDialog("Argh!! Lexa ho detto stooop!!", ryoAngryFace);
-
-        // CAMBIO STATO: Aggiorna l'obiettivo nel Manager
-        // Questo farà scattare la UI: "OBIETTIVO: TROVA IL TELEFONO"
-        if (ObjectiveManager.Instance != null)
+        // Stop locale se presente
+        if (alarmAudio != null)
         {
-            ObjectiveManager.Instance.SetObjective("TROVA IL TELEFONO");
+            if (alarmAudio.isPlaying) alarmAudio.Stop();
         }
 
-        // OPZIONALE: Resettiamo il contatore o disabilitiamo l'interazione speciale
-        // Da ora in poi, l'if iniziale fallirà e l'oggetto diventerà "normale"
+        // Stop gestito dall'AudioManager (se abbiamo una source restituita)
+        if (alarmManagedSource != null)
+        {
+            alarmManagedSource.Stop();
+            alarmManagedSource = null;
+        }
+
+        // Riproduci suono di stop: preferisci stopAudio locale, altrimenti AudioManager
+        if (stopAudio != null)
+        {
+            stopAudio.loop = false;
+            stopAudio.Play();
+        }
+        else if (!string.IsNullOrEmpty(stopClipId) && AudioManager.Instance != null)
+        {
+            if (AudioManager.Instance.HasClip(stopClipId))
+                AudioManager.Instance.PlayOneShot(stopClipId);
+            else
+                Debug.LogWarning($"SmartSpeaker: stopClipId '{stopClipId}' non trovato in AudioManager");
+        }
+
+        DialogManager.Instance.ShowDialog("Argh!! Lexa ho detto stooop!!", ryoAngryFace);
+
+        if (InteractionPromptUI.Instance != null)
+            InteractionPromptUI.Instance.HidePrompt();
+
+        StartCoroutine(WaitDialogThenFade());
+    }
+
+    private IEnumerator WaitDialogThenFade()
+    {
+        yield return new WaitForSeconds(2.0f);
+
+        IntroController.Instance.FinishIntro();
+
+        yield return new WaitForSeconds(1.0f);
+
+        DialogManager.Instance.ShowDialogPersistent(
+            "Buongiorno Ryo, non dimenticarti di fare del buon movimento con W A S D o con l'Analogico sinistro del Controller",
+            interactableData.interlocutorPortrait
+        );
+    }
+
+    // Utility: ferma la sveglia se l'oggetto viene disattivato/distrutto
+    private void OnDisable()
+    {
+        if (alarmAudio != null && alarmAudio.isPlaying) alarmAudio.Stop();
+        if (alarmManagedSource != null) alarmManagedSource.Stop();
     }
 }

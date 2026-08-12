@@ -2,11 +2,31 @@ using UnityEngine;
 
 public class DebugInput : MonoBehaviour
 {
+    [Header("Riferimenti")]
+    public GameEntity playerEntity; // Trascina qui il Player (Ryo)
+
     [Header("Oggetto di Test")]
     public SO_Item itemDiProva; // Trascina qui il Telefono o il Medikit
 
     void Update()
     {
+        // --- GESTIONE SALUTE (Spostato da HealthUI) ---
+        if (Input.GetKeyDown(KeyCode.H))
+        {
+            if (playerEntity != null)
+            {
+                playerEntity.Heal(10);
+                Debug.Log("[DEBUG] Curato 10 HP");
+            }
+        }
+        if (Input.GetKeyDown(KeyCode.J))
+        {
+            if (playerEntity != null)
+            {
+                playerEntity.TakeDamage(10);
+                Debug.Log("[DEBUG] Inflitto 10 Danni");
+            }
+        }
         // Tasto J: Aggiunge un oggetto (per vedere se l'inventario funziona)
         /*if (Input.GetKeyDown(KeyCode.J))
         {

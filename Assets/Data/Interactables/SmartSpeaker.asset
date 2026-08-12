@@ -12,11 +12,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9cbfae28123821e45a1f194e41db6486, type: 3}
   m_Name: SmartSpeaker
   m_EditorClassIdentifier: 
-  id: smartspeaker
+  id: Interactable_Lexa
   displayName: Lexa
-  characterPortrait: {fileID: 21300000, guid: 7003ad22f9a14c647bb3c99a31defd47, type: 3}
+  characterPortrait: {fileID: 21300000, guid: cf7e2cba3fd3843408bf914fe0c79757, type: 3}
+  interlocutorPortrait: {fileID: 21300000, guid: 13db988e3e1b11246ad5a727f0b24be0,
+    type: 3}
   dialogueLines:
-  - ........
+  - Un giorno di questi ti lancio dalla finestra!
   memoryVariants: []
   factToLearn: 
   itemToGive: {fileID: 0}

@@ -100,7 +100,16 @@ public class CameraManager : MonoBehaviour
     Transform FindPlayerTransform()
     {
         GameObject playerObj = GameObject.FindWithTag("Player");
-        return playerObj != null ? playerObj.transform : null;
+        if (playerObj == null) return null;
+
+        // Cerca il punto di follow dedicato, posizionato all'altezza del busto
+        Transform cameraTarget = playerObj.transform.Find("CameraTarget");
+        if (cameraTarget != null) return cameraTarget;
+
+        // Fallback di sicurezza: usa il root (ma la camera sarà ai piedi)
+        Debug.LogWarning("[CameraManager] 'CameraTarget' non trovato su Player. " +
+                         "Aggiungi un GameObject figlio con quel nome all'altezza del busto.");
+        return playerObj.transform;
     }
 
 

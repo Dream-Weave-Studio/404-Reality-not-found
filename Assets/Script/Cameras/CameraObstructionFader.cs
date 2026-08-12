@@ -1,4 +1,5 @@
-using UnityEngine;
+﻿using UnityEngine;
+using System.Collections.Generic;
 
 public class CameraObstructionFader : MonoBehaviour
 {
@@ -13,8 +14,10 @@ public class CameraObstructionFader : MonoBehaviour
     public float heightOffset = 1.5f;
 
     [Header("Visual Style (Live Edit)")]
-    public float holeRadius = 1.5f;   // Controlla la grandezza del buco
-    public float pixelDensity = 30f;  // Controlla la grossezza dei pixel
+    public float holeRadius = 1.5f;  
+    public float pixelDensity = 30f; 
+
+    private Dictionary<Collider, WallFader> faderCache = new Dictionary<Collider, WallFader>();
 
     // Debug Visivo
     private Vector3 debugRayStart;
@@ -29,19 +32,26 @@ public class CameraObstructionFader : MonoBehaviour
         Vector3 dir = targetPos - transform.position;
         float dist = dir.magnitude;
 
-        debugRayStart = transform.position;
-        debugRayEnd = targetPos;
-
-        RaycastHit[] hits = Physics.SphereCastAll(transform.position, rayRadius, dir, dist, wallLayer);
-        isHitDebug = hits.Length > 0;
+        RaycastHit[] hits = Physics.SphereCastAll(
+            transform.position, rayRadius, dir, dist, wallLayer
+        );
 
         foreach (RaycastHit hit in hits)
         {
-            WallFader fader = hit.collider.GetComponent<WallFader>();
-            if (fader == null) fader = hit.collider.GetComponentInParent<WallFader>();
-            if (fader == null) fader = hit.collider.gameObject.AddComponent<WallFader>();
+            if (!faderCache.TryGetValue(hit.collider, out WallFader fader))
+            {
+                fader = hit.collider.GetComponent<WallFader>();
+                if (fader == null) fader = hit.collider.GetComponentInParent<WallFader>();
+                faderCache[hit.collider] = fader; 
+            }
 
-            // Passiamo TUTTI i parametri visivi ogni frame
+            if (fader == null)
+            {
+                Debug.LogWarning($"[CameraObstructionFader] {hit.collider.name} " +
+                                 "è sul wallLayer ma non ha WallFader. Aggiungilo in Editor.");
+                continue; 
+            }
+
             fader.StayOpen(targetPos, fadeSpeed, closeSpeed, holeRadius, pixelDensity);
         }
     }

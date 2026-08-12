@@ -14,12 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   id: frigo
   displayName: Frigo
-  characterPortrait: {fileID: 21300000, guid: 7003ad22f9a14c647bb3c99a31defd47, type: 3}
+  characterPortrait: {fileID: 21300000, guid: cf7e2cba3fd3843408bf914fe0c79757, type: 3}
+  interlocutorPortrait: {fileID: 0}
   dialogueLines:
-  - "Questo frigo puzza sempre di pi\xF9 ogni giorno."
-  - Vuoto...
+  - "Gi\xE0 controllato. Latte scaduto, niente colazione."
   memoryVariants: []
-  factToLearn: frigo
+  factToLearn: seen_frigo
   itemToGive: {fileID: 0}
   destroyAfterInteraction: 0
   requiredItem: {fileID: 0}

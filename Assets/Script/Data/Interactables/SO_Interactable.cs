@@ -8,6 +8,7 @@ public class SO_Interactable : ScriptableObject
     public string id;
     public string displayName;
     public Sprite characterPortrait;
+    public Sprite interlocutorPortrait;
 
     [Header("Contenuto Base (Default)")]
     [TextArea(3, 10)]
