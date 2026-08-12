@@ -1,0 +1,84 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &405788836016365806
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6877788299356179795}
+  - component: {fileID: 3416526260694954459}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6877788299356179795
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405788836016365806}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0.71395206, y: 2.2661715, z: -0.63389015}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3416526260694954459
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 405788836016365806}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0297b01bca7e2574598282bac8a9710e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  audioMixer: {fileID: 24100000, guid: db266560dee72e249990e76e857e19c3, type: 2}
+  musicGroup: {fileID: 5376845222325180908, guid: db266560dee72e249990e76e857e19c3,
+    type: 2}
+  sfxGroup: {fileID: 7371553768694398024, guid: db266560dee72e249990e76e857e19c3,
+    type: 2}
+  voiceGroup: {fileID: -6752256338964747790, guid: db266560dee72e249990e76e857e19c3,
+    type: 2}
+  musicSourceA: {fileID: 0}
+  musicSourceB: {fileID: 0}
+  musicFadeTime: 0.5
+  defaultMusicVolume: 1
+  sfxPoolParent: {fileID: 0}
+  poolSize: 10
+  expandPoolIfNeeded: 1
+  audioClips:
+  - id: sveglia_loop
+    clip: {fileID: 8300000, guid: 14b92330ac63dc44aa389ce1098c6666, type: 3}
+  - id: PC
+    clip: {fileID: 0}
+  - id: Cassettiere
+    clip: {fileID: 0}
+  - id: dinostrabico
+    clip: {fileID: 0}
+  - id: Porte
+    clip: {fileID: 0}
+  - id: 
+    clip: {fileID: 0}
+  - id: 
+    clip: {fileID: 0}
+  - id: 
+    clip: {fileID: 0}
+  - id: 
+    clip: {fileID: 0}
+  - id: 
+    clip: {fileID: 0}
+  musicPrefKey: AudioManager_MusicVolume
+  sfxPrefKey: AudioManager_SFXVolume
+  voicePrefKey: AudioManager_VoiceVolume

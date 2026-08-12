@@ -8475,6 +8475,8 @@ MonoBehaviour:
   interactionCount: 0
   alarmAudio: {fileID: 1227815066}
   stopAudio: {fileID: 1227815066}
+  alarmClipId: 
+  stopClipId: 
   ryoSleepyFace: {fileID: 21300000, guid: cf7e2cba3fd3843408bf914fe0c79757, type: 3}
   ryoAngryFace: {fileID: 21300000, guid: cf7e2cba3fd3843408bf914fe0c79757, type: 3}
   speakerName: Ryo
@@ -8487,7 +8489,8 @@ AudioSource:
   m_GameObject: {fileID: 1227815062}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: 7371553768694398024, guid: db266560dee72e249990e76e857e19c3,
+    type: 2}
   m_audioClip: {fileID: 8300000, guid: ab7145505c7744b44bc489bb10d17f55, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 1
@@ -8534,7 +8537,7 @@ AudioSource:
     m_Curve:
     - serializedVersion: 3
       time: 0
-      value: 0
+      value: 1
       inSlope: 0
       outSlope: 0
       tangentMode: 0
@@ -19590,6 +19593,138 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
+--- !u!1001 &6362709183597130259
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 405788836016365806, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_Name
+      value: AudioManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: sfxGroup
+      value: 
+      objectReference: {fileID: 7371553768694398024, guid: db266560dee72e249990e76e857e19c3,
+        type: 2}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: audioMixer
+      value: 
+      objectReference: {fileID: 24100000, guid: db266560dee72e249990e76e857e19c3,
+        type: 2}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: musicGroup
+      value: 
+      objectReference: {fileID: 5376845222325180908, guid: db266560dee72e249990e76e857e19c3,
+        type: 2}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: voiceGroup
+      value: 
+      objectReference: {fileID: -6752256338964747790, guid: db266560dee72e249990e76e857e19c3,
+        type: 2}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: audioClips.Array.data[0].id
+      value: sveglia
+      objectReference: {fileID: 0}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: audioClips.Array.data[2].id
+      value: cassettiera
+      objectReference: {fileID: 0}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: audioClips.Array.data[3].id
+      value: dinostrabico 1.0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: audioClips.Array.data[5].id
+      value: Chiavi
+      objectReference: {fileID: 0}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: audioClips.Array.data[6].id
+      value: Medikit
+      objectReference: {fileID: 0}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: audioClips.Array.data[7].id
+      value: TV
+      objectReference: {fileID: 0}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: audioClips.Array.data[8].id
+      value: footsteps
+      objectReference: {fileID: 0}
+    - target: {fileID: 3416526260694954459, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: audioClips.Array.data[0].clip
+      value: 
+      objectReference: {fileID: 8300000, guid: ab7145505c7744b44bc489bb10d17f55, type: 3}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.71395206
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 2.2661715
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.63389015
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6877788299356179795, guid: 828cc4cb66eb7e7419686d831ecc7166,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 828cc4cb66eb7e7419686d831ecc7166, type: 3}
 --- !u!33 &6369856851768984113
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -21904,3 +22039,4 @@ SceneRoots:
   - {fileID: 2700226723319124380}
   - {fileID: 320853705}
   - {fileID: 57076165}
+  - {fileID: 6362709183597130259}
